@@ -1,0 +1,259 @@
+<style type="text/css">
+#<*$controller*> ul{ width:780px;}
+#<*$controller*> li{ float:left; width:250px; text-align:right; margin-left:10px; margin-bottom:5px;}
+#formlist { clear:both; padding:20px 5px; text-align:right;width:780px;}
+#formlist table{ width:780px; clear:both}
+#formlist th,td{ text-align:center}
+#total { clear:both; width:780px; text-align:center; font-size:24px;}
+.readme{clear:both; padding-left:30px}
+</style>
+<div id="<*$controller*>">
+<div id="title">
+<ul class="clear">
+<li>单据编号：<input type="text"  disabled="disabled" value="<*$sailno*>" class="txt"></li>
+<li>操作员：<input type="text"  disabled="disabled" value="<*$this->_user->workid*>" class="txt"></li>
+<li>日期：<input type="text" disabled="disabled" value="<*$date*>" class="txt"></li>
+<li>会员：<input type="text" name="vip" value="" class="txt"></li>
+<li>折扣：<input type="text" name="discount" value="1" class="txt"></li>
+<li>业务员：<input type="text" name="sailer" value="" class="txt"></li>
+</ul>
+
+</div>
+<div id="formlist"  >
+<input  type="text" class="txt"  value="" id="goodsno" name="goodsno" onkeypress="getfocus(event)"/><input class="btn" type="button"  id="searchBtn" value="输入产品编号" onclick="getSearch(event)"/>
+<table id="tb1" >
+<tbody id="tbody1">
+<tr>
+<th>编号</th>
+<th>名称</th>
+<th>型号(尺码)</th>
+<th>数量</th>
+<th>单位</th>
+<th>品牌</th>
+<th>售价</th>
+<th>折扣</th>
+<th>金额</th>
+<th>&nbsp;</th>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="readme">说明：数量为负数表示退货</div>
+<div id="total"  >
+合计数量 ：<span id="allnum">0</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;合计金额：&yen;<span id="allprice">0</span>&nbsp;&nbsp;&nbsp;<input type="button" class="btn" value=" 收款 " onclick="shoukuan()"/>
+</div>
+</div>
+<script type="text/javascript" src="/js/prototype.js"></script>
+<script type="text/javascript" >
+function getfocus(event){   
+	e = event ? event :(window.event ? window.event : null);
+
+    if(e.keyCode==13){
+		 var tmpEle=document.getElementById('goodsno');
+		 if(tmpEle==null){
+			   tmpEle=eval('goodsno');
+		 }   
+		 if(tmpEle.value==null || tmpEle.value==''){
+			  alert('请输入商品编号或名称');
+			  $('goodsno').focus(); 
+			  event.returnValue = false;  
+			  return false;
+		 }
+		 
+		 processPost();
+
+	}
+	  
+}  
+function getSearch(event){   
+
+		 var tmpEle=document.getElementById('goodsno');
+		 if(tmpEle==null){
+			   tmpEle=eval('goodsno');
+		 }   
+		 if(tmpEle.value==null || tmpEle.value==''){
+			  alert('请输入商品编号或名称');
+			  event.returnValue = false;  
+			  $('goodsno').focus(); 
+			  return false;
+		 }
+		 
+		 processPost();
+	  
+}  
+
+  
+  
+   	function processPost()
+	{
+
+		var v = $F('goodsno');
+
+		var url = '/<*$controller*>/checkgoods';
+		var pars = 'goodsno=' + v;
+
+		var myAjax = new Ajax.Request( url, { method: 'post', parameters: pars, onComplete:showResponse_button});
+	}
+	function showResponse_button(originalRequest)
+	{
+		
+		if(originalRequest.responseText==-1 ){
+			 alert('系统方法错误');
+			$('goodsno').focus(); 
+			$('goodsno').select(); 
+			event.returnValue = false;  
+		}else if(originalRequest.responseText==-2 ){
+			 alert('输入不能为空');
+			$('goodsno').focus(); 
+			$('goodsno').select(); 
+			event.returnValue = false;  
+		}else if(originalRequest.responseText==-3){
+		 //查询数据库
+			 alert('基本信息中无此编号的商品');
+			$('goodsno').focus(); 
+			$('goodsno').select(); 
+			event.returnValue = false;  
+			
+    	}else{
+			
+
+			var jsonArray =eval('(' + originalRequest.responseText + ')');       
+			if(jsonArray.count==1){
+				//增加 行
+				var  tabObj = document.getElementById("tbody1");
+				var tdcontent='<tr id="g'+jsonArray.result[0].goodsid+'">';
+				tdcontent =tdcontent +'<td>'+jsonArray.result[0].goodsno+'</td>';
+				tdcontent =tdcontent +'<td>'+jsonArray.result[0].goodsname+'</td>';
+				tdcontent =tdcontent +'<td>'+jsonArray.result[0].xinghao+'</td>';
+				tdcontent =tdcontent +'<td><input type="text" class="txt" style="width:40px;text-align:center" value="1"  id="goodsnum_'+jsonArray.result[0].goodsid+'" name="goodsnum[]" onKeyUp="cal(\''+jsonArray.result[0].goodsid+'\')"></td>';
+				tdcontent =tdcontent +'<td>'+jsonArray.result[0].unitname+'</td>';
+				tdcontent =tdcontent +'<td>'+jsonArray.result[0].brandname+'</td>';
+				tdcontent =tdcontent +'<td><input type="text" class="txt" style="width:80px;text-align:right" value="'+jsonArray.result[0].price+'"  id="price_'+jsonArray.result[0].goodsid+'" name="price[]" onKeyUp="cal(\''+jsonArray.result[0].goodsid+'\')" ></td>';
+				tdcontent =tdcontent +'<td>'+jsonArray.result[0].discount+'</td>';
+				tdcontent =tdcontent +'<td id="allprice_'+jsonArray.result[0].goodsid+'">'+jsonArray.result[0].price+'</td>';
+				tdcontent =tdcontent +'<td><input type="button" value="删除" name="B1" class="btn" onclick="del(this)"</td></tr>';
+				
+				
+				
+				tabObj.insertRow(tabObj.rows.length).innerHTML = tdcontent;
+				 calAll();
+				
+			}else if(jsonArray.count>1){
+				//弹出选择窗口
+				var popwindow='<table id="tb2" ><table id="tb2" ><tbody id="tbody2"><tr><th>编号</th><th>名称</th><th>型号(尺码)</th><th>数量</th><th>单位</th><th>品牌</th><th>售价</th><th>折扣</th><th>金额</th><th>&nbsp;</th></tr></tbody></table>';
+				
+				$('showFrame').innerHTML=popwindow;
+				
+				var  tabObj = document.getElementById("tbody2");   
+				for(i=0;i<jsonArray.count;i++){
+					var tdcontent='<tr id="g'+jsonArray.result[i].goodsid+'">';
+				tdcontent =tdcontent +'<td>'+jsonArray.result[i].goodsno+'</td>';
+				tdcontent =tdcontent +'<td>'+jsonArray.result[i].goodsname+'</td>';
+				tdcontent =tdcontent +'<td>'+jsonArray.result[i].xinghao+'</td>';
+				tdcontent =tdcontent +'<td>1</td>';
+				tdcontent =tdcontent +'<td>'+jsonArray.result[i].unitname+'</td>';
+				tdcontent =tdcontent +'<td>'+jsonArray.result[i].brandname+'</td>';
+				tdcontent =tdcontent +'<td>'+jsonArray.result[i].price+'</td>';
+				tdcontent =tdcontent +'<td>'+jsonArray.result[i].discount+'</td>';
+				tdcontent =tdcontent +'<td>'+jsonArray.result[i].price+'</td>';
+				tdcontent =tdcontent +'<td><input type="button" value="选择" name="B1" class="btn" onclick="selected(\''+jsonArray.result[i].goodsno+'\')"</td></tr>';
+				
+				
+
+
+
+				tabObj.insertRow(tabObj.rows.length).innerHTML = tdcontent;
+				}
+				
+				 showGoods();
+				
+			}else{
+				alert(originalRequest.responseText);    
+			}
+			
+				$('goodsno').value='';
+				$('goodsno').focus(); 
+		}
+	} 
+
+	
+function del(o){
+	if(confirm("确认要删除?")){
+		var t=document.getElementById('tbody1')
+		t.deleteRow(o.parentNode.parentNode.rowIndex);
+		calAll();
+		$('goodsno').value='';
+		$('goodsno').focus(); 
+	}
+}
+
+function selected(goodsno){
+	parent.document.getElementById('goodsno').value=goodsno;
+	parent.divwindow.hide();
+}
+
+
+window.onload = function() {
+  document.getElementById("goodsno").focus();
+}
+function calAll(){
+	var  goodsnum = document.getElementsByName("goodsnum[]") ;
+	var  price = document.getElementsByName("price[]") ;
+        var allnum=0;
+        var allprice=0;
+        for (var i=0;i<goodsnum.length;i++ )
+        {           
+            allnum +=Number(goodsnum[i].value);
+			allprice +=Number(goodsnum[i].value)*Number(price[i].value);
+        }
+	
+
+	$('allnum').innerHTML=Number(allnum);
+	$('allprice').innerHTML=Number(allprice).toFixed(2);;
+
+}
+
+function cal(id){
+	if(parseInt($('price_'+id).value)<0){
+		alert('金额不能为负数');
+		$('price_'+id).value=0;
+		return false;
+	}
+
+	var allproce=parseInt($('goodsnum_'+id).value)*parseInt($('price_'+id).value);
+	$('allprice_'+id).innerHTML=parseInt(allproce).toFixed(2);
+	calAll();
+}
+</script>
+
+<link rel="stylesheet" href="/css/modal.css" type="text/css" />
+<script type="text/javascript" src="/js/dhtmlwindow.js"></script>
+<script type="text/javascript" src="/js/modal.js"></script>
+<script type="text/javascript">
+
+function showGoods(){
+
+	divwindow=dhtmlmodal.open('EmailBox', 'div', 'showFrame', '商品选择', 'width=600px, height=300px, center=1, resize=0, scrolling=1')
+
+	divwindow.onclose=function(){
+	processPost();
+		return true;
+	}
+} 
+function shoukuan(){
+
+	divwindow1=dhtmlmodal.open('EmailBox1', 'div', 'showFrame1', '确认订单', 'width=200px, height=300px, center=1, resize=0, scrolling=0')
+
+	divwindow1.onclose=function(){
+		return true;
+	}
+} 
+
+
+
+</script>
+<!-- 动态弹出窗口代码 结束 -->
+<div id="showFrame" style="display:none" class="showFrame">
+</div>
+<div id="showFrame1" style="display:none" class="showFrame">
+</div>

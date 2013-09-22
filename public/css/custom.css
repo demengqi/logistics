@@ -1,0 +1,19 @@
+body{font-family:"微软雅黑",'Microsoft YaHei';}
+.navbar{ background-color:#333; font-size:0.8em}
+.breadcrumb{font-size:0.8em}
+#index{ text-align:center;}
+#index  .span6{ line-height:105px;}
+#index  .span4,#index .span3{ line-height:40px;}
+#index a{ color:#FFF; font-size:1.2em}
+legend{ margin-bottom:0px;}
+.dl-horizontal dt,.dl-horizontal dd{ margin-bottom:4px;}
+.dl-horizontal dt{ width:180px;}
+.dl-horizontal dd{ margin-left:190px;}
+
+#scrollUp {
+  bottom: 20px;
+  right: 20px;
+  height: 38px;  /* Height of image */
+  width: 38px; /* Width of image */
+  background: url("/images/top.png") no-repeat;
+}
