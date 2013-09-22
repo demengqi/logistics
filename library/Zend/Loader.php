@@ -327,7 +327,7 @@ class Zend_Loader
      * @param string $file - The file name to be loaded.
      * @return string
      */
-    public static function standardiseFile($file)
+   public static function standardiseFile($file)
     {
         $fileName = ltrim($file, '\\');
         $file      = '';
@@ -337,7 +337,17 @@ class Zend_Loader
             $fileName = substr($fileName, $lastNsPos + 1);
             $file      = str_replace('\\', DIRECTORY_SEPARATOR, $namespace) . DIRECTORY_SEPARATOR;
         }
-        $file .= str_replace('_', DIRECTORY_SEPARATOR, $fileName) . '.php';
-        return $file;    
+          if(strtolower(substr($fileName, 0, 6)) !== 'smarty')
+             $file .= str_replace('_', DIRECTORY_SEPARATOR, $fileName) . '.php';
+          else{
+               if(substr($fileName, 0, 6) === 'Smarty') {
+                    $file .= 'Smarty'. DIRECTORY_SEPARATOR .'sysplugins' . DIRECTORY_SEPARATOR . strtolower($fileName) . '.php';
+               }
+               else if(substr($fileName, 0, 6) === 'smarty') {
+                    $file .= 'Smarty'. DIRECTORY_SEPARATOR .'plugins' . DIRECTORY_SEPARATOR . strtolower($fileName) . '.php';
+               }
+          }
+              
+        return $file;   
     }
 }
