@@ -1,5 +1,9 @@
-<div id="<*$controller*>">
-<*include file="<*$controller*>/location.tpl"*>
+<div class="main container" id="<*$controller*>">
+  <div class="row">
+ <div class="span2 bs-docs-sidebar ">
+ 	 
+<*include file="<*$controller*>/location.tpl"*> </div>
+    <div class="span10 clearfix " >
 <form onsubmit="return checkit();" action="/<*$controller*>/opedit" method="post" >
 <style type="text/css">
 dt{ position: absolute; z-index:10; float:left; width:150px; text-align:right}
@@ -40,6 +44,8 @@ dd{ padding-left:155px; margin-bottom:6px;}
 <dd><input type="text" name="huohao[<*$item.goodsid*>]" value="<*$item.huohao*>" class="txt" id="huohao<*$key*>" /></dd>
 <dt>商品数量</dt>
 <dd><*$item.goodsnum*></dd>
+<dt>销售价格</dt>
+<dd><input type="text" name="outprice[<*$item.goodsid*>]" value="<*$item.outprice*>" class="txt" id="outprice<*$key*>" /></dd>
 <dt>规格或颜色</dt>
 <dd><input type="text" name="guige[<*$item.goodsid*>]" value="<*$item.guige*>" class="txt"  id="guige<*$key*>"/></dd>
 
@@ -51,6 +57,8 @@ dd{ padding-left:155px; margin-bottom:6px;}
 <hr />
 <*/foreach	*>
 </form>
+    </div>
+  </div>
 </div>
 
 <script type="application/javascript">

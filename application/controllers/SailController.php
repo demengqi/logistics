@@ -122,7 +122,7 @@ Array
 			if(empty($goodsno))
 				throw new Exception ( -2 );
 			
-			$sql='select * from goods_v where goodsno like "%'.$goodsno.'%" or goodsname like "%'.$goodsno.'%" and goodsnum>0';
+			$sql='select * from goods where goodsno like "%'.$goodsno.'%" or goodsname like "%'.$goodsno.'%" and goodsnum>0';
 			$result=$this->_dbAdapter->fetchAll($sql);
 			if(!$result)
 				throw new Exception ( -3 );
