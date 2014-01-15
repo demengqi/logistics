@@ -28,7 +28,7 @@
 
 </div>
 <div id="formlist"  >
-<input  type="text" class="txt"  value="" id="goodsno" onkeypress="getfocus(event)"/>&nbsp;&nbsp;<input class="btn" type="button"  id="searchBtn" value="输入产品编号" onclick="getSearch(event)"/>
+<input  type="text" class="txt"  value="" id="goodsno" onkeypress="getfocus(event)"/>&nbsp;&nbsp;<input class="btn" type="button"  id="searchBtn" value="输入商品编号" onclick="getSearch(event)"/>
 <table id="tb1" >
 <tbody id="tbody1">
 <tr>

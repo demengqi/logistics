@@ -1,15 +1,5 @@
-body{font-family:"微软雅黑",'Microsoft YaHei';}
-.navbar{ background-color:#333; font-size:0.8em}
-.breadcrumb{font-size:0.8em}
-#index{ text-align:center;}
-#index  .span6{ line-height:105px;}
-#index  .span4,#index .span3{ line-height:40px;}
-#index a{ color:#FFF; font-size:1.2em}
-legend{ margin-bottom:0px;}
-.dl-horizontal dt,.dl-horizontal dd{ margin-bottom:4px;}
-.dl-horizontal dt{ width:180px;}
-.dl-horizontal dd{ margin-left:190px;}
-
+body{padding-top: 40px;font-family: "Helvetica Neue", Helvetica, Arial, "Microsoft Yahei UI", "Microsoft YaHei", SimHei, "\5B8B\4F53", simsun, sans-serif; }
+.navbar .brand { padding-bottom:0px;padding-top:0px; line-height:40px;}
 #scrollUp {
   bottom: 20px;
   right: 20px;
@@ -18,5 +8,27 @@ legend{ margin-bottom:0px;}
   background: url("/images/top.png") no-repeat;
 }
 
+.white-panel{background-color:#fff;border:1px solid #dadada;padding:0px;margin-bottom:40px;color:#333;-webkit-border-radius:6px;-moz-border-radius:6px;border-radius:6px;-webkit-box-shadow:0 1px 2px rgba(0, 0, 0, .075);-moz-box-shadow:0 1px 2px rgba(0,0,0,.075);box-shadow:0 1px 2px rgba(0, 0, 0, .075);}
+.white-panel-content{ padding:15px }
+.white-panel-content5{ padding:5px;}
+
+.control-label{ font-size:1.0em;}
+
+.footer-logo{ background:url("/images/logo.png") no-repeat left top; padding-left:80px; padding-bottom:10px;}
+
+.nav-header{ font-size:14px;}
+
+.lastboard{  padding-left:55px; background:url(/images/bg_repno.gif) no-repeat -240px -600px;}
+.board{  padding-left:55px; background:url(/images/bg_repno.gif) no-repeat -240px -545px; }
+#menu{ font-size:0.8em;}
+
+
+#index{ text-align:center;}
+#index  .span6{ line-height:105px;}
+#index  .span4,#index .span3{ line-height:40px;}
+#index a{ color:#FFF; font-size:1.2em}
+legend{ margin-bottom:0px;}
+
 .footer{background-color:#f5f5f5; border-top:1px solid #e5e5e5; padding-bottom:40px; margin-top:25px}
 .footer p{color:#777777;}
+.main{ min-height:500px;}

@@ -8,7 +8,7 @@
         <table class="table">
           <tr>
             <th  class="span2">商品编号 <i class="icon-star"></i></th>
-            <td colspan="3"><input type="text" name="goodsno" value="" class="input-xlarge" id="goodsno" placeholder="商品编号或条形码"/>
+            <td colspan="3"><input type="text" name="goodsno" value="<*$goodsno*>" class="input-xlarge" id="goodsno" placeholder="商品编号或条形码"/>
               <small id="readme1" class="label-warning"></small></td>
           </tr>
           <tr>
@@ -60,7 +60,7 @@
         </table>
         <input type="submit" value="保存商品信息"  class="btn btn-large btn-primary"/>
         &nbsp;&nbsp;
-        <button type="button" class="btn  btn-large" onclick="window.location.reload();">重新录入</button>
+        <button type="button" class="btn  btn-large" onclick="window.location='/<*$controller*>/<*$action*>'">重新录入</button>
       </form>
     </div>
   </div>

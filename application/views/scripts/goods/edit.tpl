@@ -16,6 +16,9 @@ dd{ padding-left:155px; margin-bottom:6px;}
 <dd><input type="text" readonly="readonly" disabled="disabled" name="goodsno[<*$item.goodsid*>]" value="<*$item.goodsno*>" class="txt" id="goodsno<*$key*>"/><span id="readme1_<*$key*>" class="red"></span></dd>
 <dt>商品名称<span class="red">*</span></dt>
 <dd><input type="text" name="goodsname[<*$item.goodsid*>]" value="<*$item.goodsname*>" class="txt" id="goodsname<*$key*>"/><span id="readme2_<*$key*>" class="red"></span></dd>
+<dt>&nbsp;</dt>
+<dd><label class="checkbox"><input type="checkbox" name="isover[<*$item.goodsid*>]" value="1" id="isover<*$key*>" <*if $item.isover*> checked="checked"<*/if*>/> 停售</label></dd>
+
 <dt>单位</dt>
 <dd><select name="unitid[<*$item.goodsid*>]" id="unit<*$key*>">
 <option value="0" selected="selected"> 请选择单位 </option>
@@ -44,11 +47,10 @@ dd{ padding-left:155px; margin-bottom:6px;}
 <dd><input type="text" name="huohao[<*$item.goodsid*>]" value="<*$item.huohao*>" class="txt" id="huohao<*$key*>" /></dd>
 <dt>商品数量</dt>
 <dd><*$item.goodsnum*></dd>
-<dt>销售价格</dt>
+<dt>零售价</dt>
 <dd><input type="text" name="outprice[<*$item.goodsid*>]" value="<*$item.outprice*>" class="txt" id="outprice<*$key*>" /></dd>
 <dt>规格或颜色</dt>
 <dd><input type="text" name="guige[<*$item.goodsid*>]" value="<*$item.guige*>" class="txt"  id="guige<*$key*>"/></dd>
-
 <dt>备注</dt>
 <dd><input type="text" name="memo[<*$item.goodsid*>]" value="<*$item.memo*>" class="txt" id="memo<*$key*>"/></dd>
 <dt>&nbsp;</dt>

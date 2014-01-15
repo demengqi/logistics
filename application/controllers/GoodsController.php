@@ -1,5 +1,7 @@
 <?php
-
+/*
+商品管理
+*/
 class GoodsController extends MyClass_Action {
 	protected $controller;
 	protected $action;
@@ -37,7 +39,7 @@ class GoodsController extends MyClass_Action {
 				$where .=' and (goodsno like "%'.$goodsname.'%" or goodsname like "%'.$goodsname.'%")';
 			}
 			
-		$sql = 'SELECT SQL_CALC_FOUND_ROWS * FROM goods where 1 ' . $where . $order . " limit $offset,$count";
+		$sql = 'SELECT SQL_CALC_FOUND_ROWS * FROM goods_v where 1 ' . $where . $order . " limit $offset,$count";
 		//echo $sql;exit;
 		$result = $this->_dbAdapter->fetchAll ( $sql );
 			//翻页控制
@@ -57,14 +59,14 @@ class GoodsController extends MyClass_Action {
 			//获取单位列表
 			$this->view->unitlist=$this->_dbAdapter->fetchPairs('select * from units ');
 
-			foreach($result as $key => $value){
-				if(!empty($value['typeid']))
-					$result[$key]['type']=$this->view->typelist[$value['typeid']];
-				if(!empty($value['brandid']))
-					$result[$key]['brand']=$this->view->brandlist[$value['brandid']];
-				if(!empty($value['unitid']))
-					$result[$key]['unit']=$this->view->unitlist[$value['unitid']];
-			}
+			//foreach($result as $key => $value){
+				//if(!empty($value['typeid']))
+				//	$result[$key]['type']=$this->view->typelist[$value['typeid']];
+				//if(!empty($value['brandid']))
+				//	$result[$key]['brand']=$this->view->brandlist[$value['brandid']];
+				//if(!empty($value['unitid']))
+				//	$result[$key]['unit']=$this->view->unitlist[$value['unitid']];
+		//	}
 			//print_r($result);
 			$this->view->result = $result;
 			
@@ -77,6 +79,8 @@ class GoodsController extends MyClass_Action {
 	//用户首页
 	public function addAction() {
 		try {
+		$goodsno = ( int ) $this->_request->getParam ( 'goodsno' );
+		$this->view->goodsno=$goodsno==0?'':$goodsno;
 			//获取类型列表
 		$this->view->typelist=$this->_dbAdapter->fetchPairs('select * from types ');
 		//获取品牌列表 
@@ -167,7 +171,8 @@ class GoodsController extends MyClass_Action {
 			$num=$this->_dbAdapter->fetchOne($sql);
 			if(!$num)
 				throw new Exception ( '无数据！' );
-
+			$result=$this->_dbAdapter->update('goods',array('isover'=>1),'goodsid in ('.$idlist.')');
+/*
 			$time=time();
 			$sql='insert ignore goods_delete select *,'.$time.' from goods where goodsid in ('.$idlist.') ';			
 			$this->_dbAdapter->query($sql);
@@ -176,11 +181,12 @@ class GoodsController extends MyClass_Action {
 			if($deletenum== $num){
 				$result=$this->_dbAdapter->delete('goods','goodsid in ('.$idlist.')');
 			}
+			*/
 			if($result){
 				$this->log(var_export ( '[idlist]'.$idlist, true ));
-				$this->feedback ( '成功删除'.$deletenum.'数据', '注意', '/'.$this->controller.'', 'tip' );
+				$this->feedback ( '成功停售'.$num.'数据', '注意', '/'.$this->controller.'', 'tip' );
 			}else	
-				throw new Exception ( '删除失败 ！' );
+				throw new Exception ( '操作失败或重复操作 ！' );
 				
 		} catch ( Exception $e ) {
 			$this->feedback ( $e->getMessage (), '注意', 'javascript:window.history.back();', 'warning' );
@@ -194,7 +200,7 @@ class GoodsController extends MyClass_Action {
 			}
 			
 			$p =$this->_request->getPost ();
-			//print_r($p);
+//			print_r($p);exit;
 			if(!isset($p['goodsid']) || empty($p['goodsid']))
 				throw new Exception ( '不能为空！' );
 			$isok=0;
@@ -208,6 +214,8 @@ class GoodsController extends MyClass_Action {
 				$data['lasttime']=time();
 				//$this->log(Zend_Debug::dump($data,'data',0));
 				$this->log(var_export ( $data, true ));
+				if(!isset($data['isover']))
+					$data['isover']=0;
 				$result=$this->_dbAdapter->update('goods',$data,'goodsid='.$key);
 				if($result)
 					$isok=1;
@@ -433,7 +441,35 @@ class GoodsController extends MyClass_Action {
 		}
 	}
 				
+				
 
+	public function checkgoodsAction(){
+		try {
+			if (! $this->isPost ()) {
+					throw new Exception ( -1 );
+			}
+			
+			$goodsno =addslashes(trim($this->_request->getPost ('goodsno')));
+			if(empty($goodsno))
+				throw new Exception ( -2 );
+			
+			$sql='select * from goods where goodsno like "%'.$goodsno.'%" or goodsname like "%'.$goodsno.'%" and goodsnum>0';
+			$result=$this->_dbAdapter->fetchAll($sql);
+			if(!$result)
+				throw new Exception ( -3 );
+			
+			$jsonArray=array('count'=>count($result),'result'=>$result);
+			
+			echo Zend_Json::encode($jsonArray);exit;	
+			
+		} catch ( Exception $e ) {
+			echo $e->getMessage ();
+			exit;
+		}
+		
+	}
+	
+	
 			
 	 //以下内容保持不变
 	public function noRouteAction() {

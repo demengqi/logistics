@@ -15,44 +15,33 @@
 <hr />
 </div>
 <*if $result*>
-<div style="float:left"><input type="button" value="修改" class="btn  btn-small btn-primary" onclick="return editit();" />
-&nbsp;&nbsp;<input type="button"  value="删除"  class="btn btn-small" onclick="return deleteit();"/></div>
-<*$page*>
 <table class="table">
   <tr>
-    <th>&nbsp;</th>
+    <th>采购日期</th>
     <th>商品编号</th>
     <th>商品名称</th>
     <th>单位</th>
-    <th>类别</th>
-    <th>品牌</th>
-    <th>型号</th>
-    <th>货号</th>
     <th>数量</th>
-    <th>零售价</th>
-    <th>规格</th>
+    <th>单价</th>
+    <th>合计</th>
     <th>备注</th>
   </tr>
   <*foreach from=$result item=item key=key*>
   <tr>
-    <td><input type="checkbox" name="goodsid" value="<*$item.goodsid*>"></td>
+    <td><*$item.adddate*></td>
     <td><*$item.goodsno*></td>
     <td><*$item.goodsname*></td>
-    <td><*$item.unit*></td>
-    <td><*$item.type*></td>
-    <td><*$item.brand*></td>
-    <td><*$item.xinghao*></td>
-    <td><*$item.huohao*></td>
+    <td><*$item.unitname*></td>
+    <td><*$item.inprice*></td>
     <td><*$item.goodsnum*></td>
-    <td><*$item.outprice*></td>
-    <td><*$item.guige*></td>
+    <td><*$item.inprice*$item.goodsnum*></td>
     <td><*$item.memo*></td>
   </tr>
   <*/foreach*>
 </table>
-<div style="float:left"><input type="button" value="修改" class="btn  btn-small btn-primary" onclick="return editit();" />
-&nbsp;&nbsp;<input type="button"  value="删除"  class="btn btn-small" onclick="return deleteit();"/></div>
-<*$page*>
+
+<*elseif $goodsno*>
+<h1><a href="/<*$controller*>/<*$action*>">搜索结果不存在，请重新搜索</a> </h1>
 
 <*else*>
 <h1><a href="/<*$controller*>/add">没有任何入库单 ,请先添加入库单</a> </h1>

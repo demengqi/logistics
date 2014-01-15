@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50532
 File Encoding         : 65001
 
-Date: 2014-01-13 23:43:34
+Date: 2014-01-13 23:46:44
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -261,8 +261,3 @@ CREATE TABLE `users` (
 -- ----------------------------
 INSERT INTO `users` VALUES ('1', '01', '超级管理员', '96e79218965eb72c92a549dd5a330112', null, 'sail,set,stat,user,history,goods,entry', '1389620940', '81');
 INSERT INTO `users` VALUES ('2', '02', '收银员01', '96e79218965eb72c92a549dd5a330112', null, 'sail,history', '1376215309', '4');
-
--- ----------------------------
--- View structure for `goods_v`
--- ----------------------------
-DROP VIEW IF EXISTS `goods_v`;

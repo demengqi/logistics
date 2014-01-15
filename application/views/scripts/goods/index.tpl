@@ -49,7 +49,7 @@ function deleteit(){
 		alert('没有任何选择');
 		return false;
 	}
-	if(confirm("删除将不能恢复，确认要删除?")){
+	if(confirm("停售将不能恢复，确认此操作?")){
 		window.location='/<*$controller*>/delete/id/'+sGet;
 	}
 }
@@ -75,7 +75,7 @@ function deleteit(){
 </div>
 <*if $result*>
 <div style="float:left"><input type="button" value="修改" class="btn  btn-small btn-primary" onclick="return editit();" />
-&nbsp;&nbsp;<input type="button"  value="删除"  class="btn btn-small" onclick="return deleteit();"/></div>
+&nbsp;&nbsp;<input type="button"  value="停售"  class="btn btn-small" onclick="return deleteit();"/></div>
 <*$page*>
 <table class="table">
   <tr>
@@ -93,13 +93,13 @@ function deleteit(){
     <th>备注</th>
   </tr>
   <*foreach from=$result item=item key=key*>
-  <tr>
+  <tr  <*if $item.isover*>class="error" style=" text-decoration:line-through" <*/if*>>
     <td><input type="checkbox" name="goodsid" value="<*$item.goodsid*>"></td>
     <td><*$item.goodsno*></td>
     <td><*$item.goodsname*></td>
-    <td><*$item.unit*></td>
-    <td><*$item.type*></td>
-    <td><*$item.brand*></td>
+    <td><*$item.unitname*></td>
+    <td><*$item.typename*></td>
+    <td><*$item.brandname*></td>
     <td><*$item.xinghao*></td>
     <td><*$item.huohao*></td>
     <td><*$item.goodsnum*></td>
@@ -110,7 +110,7 @@ function deleteit(){
   <*/foreach*>
 </table>
 <div style="float:left"><input type="button" value="修改" class="btn  btn-small btn-primary" onclick="return editit();" />
-&nbsp;&nbsp;<input type="button"  value="删除"  class="btn btn-small" onclick="return deleteit();"/></div>
+&nbsp;&nbsp;<input type="button"  value="停售"  class="btn btn-small" onclick="return deleteit();"/></div>
 <*$page*>
 
 <*else*>
