@@ -169,7 +169,7 @@ window.setTimeout("doUpdate(" + i + ")", (secs-i) * 1000);
 function doUpdate(num) 
 { 
 //document.getElementById(这里放显示秒数的控件的ID).innerHTML = num ; 
-if (num == 0){self.location.href='/'}
+if (num == 0){self.location.href='<*$url*>'}
 }
 </script>
     </body>

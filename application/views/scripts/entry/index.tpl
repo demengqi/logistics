@@ -15,6 +15,7 @@
 <hr />
 </div>
 <*if $result*>
+<*$page*>
 <table class="table">
   <tr>
     <th>采购日期</th>
@@ -39,6 +40,7 @@
   </tr>
   <*/foreach*>
 </table>
+<*$page*>
 
 <*elseif $goodsno*>
 <h1><a href="/<*$controller*>/<*$action*>">搜索结果不存在，请重新搜索</a> </h1>

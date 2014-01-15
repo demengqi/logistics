@@ -1,57 +1,40 @@
-<style type="text/css">
-#<*$controller*> ul{ width:780px;}
-#<*$controller*> li{ float:left; width:250px; text-align:right; margin-left:10px; margin-bottom:5px;}
-#formlist { clear:both; padding:20px 5px; text-align:right;width:780px;}
-#formlist table{ width:780px; clear:both}
-#formlist th,td{ text-align:center}
-#total { clear:both; width:780px; text-align:center; font-size:24px;}
-.readme{clear:both; padding-left:30px}
-#jiesuan { margin:0px auto; width:375px; text-align:left; }
-#jiesuan h1{ font-size:24px; color:#F30; font-weight:bold; text-align:center; margin:25px auto; }
-#jiesuan dl{ width:375px; margin:5px 0px;}
-#jiesuan dt{ float:left; width:100px; position:absolute; text-align:right; font-size:16px;margin-bottom:5px;}
-#jiesuan dd{ padding-left:100px; text-align:left;margin-bottom:5px;}
-#jiesuan .opbtn{ padding-left:20px; margin-top:20px;}
-
-</style>
-<div id="<*$controller*>">
-<form action="/<*$controller*>/saveorder" method="post" name="order" id="order">
-<div id="title">
-<ul class="clear">
-<li>单据编号：<input type="text" readonly="readonly" value="<*$orderno*>" name="orderno" class="txt gray"></li>
-<li>操作员：<input type="text"   readonly="readonly" value="<*$this->_user->workid*>" class="txt"></li>
-<li>日期：<input type="text"  readonly="readonly" name="day"  value="<*$date*>" class="txt gray"></li>
-<!-- li>会员：<input type="text" name="vip" value="" class="txt"></li>
-<li>折扣：<input type="text" name="discount" value="1" class="txt"></li>
-<li>业务员：<input type="text" name="sailer" value="" class="txt"></li -->
-</ul>
-
-</div>
-<div id="formlist"  >
-<input  type="text" class="txt"  value="" id="goodsno" onkeypress="getfocus(event)"/>&nbsp;&nbsp;<input class="btn" type="button"  id="searchBtn" value="输入商品编号" onclick="getSearch(event)"/>
-<table id="tb1" >
-<tbody id="tbody1">
-<tr>
-<th>编号</th>
-<th>名称</th>
-<th>型号(尺码)</th>
-<th>数量</th>
-<th>单位</th>
-<th>品牌</th>
-<th>售价</th>
-<th>折扣</th>
-<th>金额</th>
-<th>&nbsp;</th>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="readme">说明：数量为负数表示退货</div>
-<div id="total"  >
-合计数量 ：<span id="allnum">0</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;合计金额：&yen;<span id="allprice">0</span>&nbsp;&nbsp;&nbsp;<input type="button" style="font-size:24px;" class="btn" value=" 收款 " onclick="shoukuan();"/>
-</div>
-<script type="text/javascript" src="/js/prototype.js"></script>
-<script type="text/javascript" >
+<div id="<*$controller*>" class="span10">
+  <form action="/<*$controller*>/saveorder" method="post" class="form-horizontal">
+    <div class="form-inline">
+          <label>单据编号：
+            <input type="text" readonly="readonly" value="<*$orderno*>" name="orderno" class="input-small form-control span2">
+          </label>
+       &nbsp;<label>操作员：
+          <input type="text"   readonly="readonly" value="<*$this->_user->workid*>" class="input-small form-control span1"></label>
+        &nbsp;<label>日期：
+          <input type="text"  readonly="readonly" name="day"  value="<*$date*>" class="input-small form-control span2"></label>
+       </div>
+     <input  type="text" class="input-xlarge"  placeholder="商品编号或条形码"  value="" id="goodsno" onkeyup="getfocus(event)"/>
+      
+      <input class="btn  btn-primary" type="button"  id="searchBtn" value="输入商品编号" onclick="getSearch(event)"/>
+      <hr />
+      <table id="tb1" class="table" >
+        <tbody id="tbody1">
+          <tr>
+            <th>编号</th>
+            <th>名称</th>
+            <th>型号(尺码)</th>
+            <th>数量</th>
+            <th>单位</th>
+            <th>品牌</th>
+            <th>售价</th>
+            <th>折扣</th>
+            <th>金额</th>
+            <th>&nbsp;</th>
+          </tr>
+        </tbody>
+      </table>
+    <div class="readme">说明：数量为负数表示退货</div>
+    <div id="total"  > 合计数量 ：<span id="allnum">0</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;合计金额：&yen;<span id="allprice">0</span>&nbsp;&nbsp;&nbsp;
+      <input type="button" style="font-size:24px;" class="btn" value=" 收款 " onclick="shoukuan();"/>
+    </div>
+    <script type="text/javascript" src="/js/prototype.js"></script> 
+    <script type="text/javascript" >
 var maxArray=new Array()
 function getfocus(event){   
 	e = event ? event :(window.event ? window.event : null);
@@ -265,11 +248,10 @@ function cal(id){
 	calAll();
 }
 </script>
-
-<link rel="stylesheet" href="/css/modal.css" type="text/css" />
-<script type="text/javascript" src="/js/dhtmlwindow.js"></script>
-<script type="text/javascript" src="/js/modal.js"></script>
-<script type="text/javascript">
+    <link rel="stylesheet" href="/css/modal.css" type="text/css" />
+    <script type="text/javascript" src="/js/dhtmlwindow.js"></script> 
+    <script type="text/javascript" src="/js/modal.js"></script> 
+    <script type="text/javascript">
 
 function showGoods(){
 
@@ -344,25 +326,47 @@ function getfocusMoney(event){
 
 
 
-</script>
-<!-- 动态弹出窗口代码 结束 -->
-<div id="showFrame" style="display:none" class="showFrame">
-<div id="showgoods">
+</script> 
+    <!-- 动态弹出窗口代码 结束 -->
+    <div id="showFrame" style="display:none" class="showFrame">
+      <div id="showgoods"> </div>
+    </div>
+    <div id="showFrame1" style="display:none" class="showFrame">
+    <div id="jiesuan">
+      <h1>收款过账</h1>
+      <dl>
+        <dt>应收金额：</dt>
+        <dd>
+          <input type="text" id="yingshou" name="yingshou"  readonly="readonly" value="0" class="txt">
+          （元）</dd>
+        <dt>实收金额：</dt>
+        <dd>
+          <input type="text" id="shishou" name="shishou" value="" class="txt">
+          （元）</dd>
+        <dt>现金来款：</dt>
+        <dd>
+          <input type="text" id="laikuan"  name="laikuan" value="" class="txt"  onkeypress="getfocusMoney(event)">
+          （元）</dd>
+        <dt>找回金额：</dt>
+        <dd>
+          <input type="text" id="zhaohui" name="zhaohui" readonly="readonly" class="txt">
+          （元）</dd>
+        <dt>支付方式：</dt>
+        <dd>
+          <input type="radio" name="paytype" id="paytype1" value="1" checked="checked"/>
+          <label for="paytype1">现金</label>
+          <input type="radio" name="paytype" id="paytype2" value="2" />
+          <label for="paytype2">刷卡</label>
+        </dd>
+      </dl>
+      <div class="opbtn">
+        <input value="废弃此单" type="button" class="btn" onclick="if(confirm('要废弃此单?')){window.location.reload();}else return false;" />
+        &nbsp;&nbsp;&nbsp;
+        <input value="返回修改" type="button" class="btn" onclick="parent.EmailBox1.hide();" />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <input value="确认过账" style="font-size:16px; color:#ff3300"  type="button" class="btn" onclick="saveit()" />
+      </div>
+    </div>
+  </form>
 </div>
-</div>
-<div id="showFrame1" style="display:none" class="showFrame">
-<div id="jiesuan"><h1>收款过账</h1>
-	<dl>
-	<dt>应收金额：</dt><dd><input type="text" id="yingshou" name="yingshou"  readonly="readonly" value="0" class="txt">（元）</dd>
-	<dt>实收金额：</dt><dd><input type="text" id="shishou" name="shishou" value="" class="txt">（元）</dd>
-	<dt>现金来款：</dt><dd><input type="text" id="laikuan"  name="laikuan" value="" class="txt"  onkeypress="getfocusMoney(event)">（元）</dd>
-	<dt>找回金额：</dt><dd><input type="text" id="zhaohui" name="zhaohui" readonly="readonly" class="txt">（元）</dd>
-	<dt>支付方式：</dt><dd><input type="radio" name="paytype" id="paytype1" value="1" checked="checked"/><label for="paytype1">现金</label> <input type="radio" name="paytype" id="paytype2" value="2" /><label for="paytype2">刷卡</label></dd>
-	</dl>
-	<div class="opbtn">
-	<input value="废弃此单" type="button" class="btn" onclick="if(confirm('要废弃此单?')){window.location.reload();}else return false;" />&nbsp;&nbsp;&nbsp;
-	<input value="返回修改" type="button" class="btn" onclick="parent.EmailBox1.hide();" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input value="确认过账" style="font-size:16px; color:#ff3300"  type="button" class="btn" onclick="saveit()" />
-	</div>
-	</div>
-    </form>
 </div>

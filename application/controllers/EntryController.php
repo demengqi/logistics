@@ -16,21 +16,39 @@ class EntryController extends MyClass_Action {
 	public function indexAction() {
 		try {
 
+			$count = 20; //pre
+			$curpage = 1;
+				//get para
+			$curpage = ( int ) $this->_request->getParam ( 'page' );
+			if ($curpage < 1)
+				$curpage = 1;
+			$offset = ($curpage - 1) * $count;
+
 			$where = '';
 			$order = ' order by `entryid` desc';
-			$limit='';
+			
 			$this->view->goodsno=$goodsno = addslashes(trim($this->_request->getParam ( 'goodsno' )));
 
 			if(!empty($goodsno)){
 				$where .=' and (goodsno like "%'.$goodsno.'%" or goodsname like "%'.$goodsno.'%")';
-			}else{
-				$limit .=' limit 0,10';
 			}
-			$sql = 'SELECT  * FROM entry_v where 1 ' . $where . $order.$limit ;
-			$result = $this->_dbAdapter->fetchAll ( $sql );
-			$this->view->result = $result;
 			
+			$sql = 'SELECT SQL_CALC_FOUND_ROWS * FROM entry_v where 1 ' . $where . $order." limit $offset,$count" ;
+			$result = $this->_dbAdapter->fetchAll ( $sql );
+			
+	
+			//翻页控制
+			$param ['file'] = '/' . $this->controller . '/' . $this->action;
+			$param ['totalnum'] = $this->_dbAdapter->fetchOne ( 'SELECT FOUND_ROWS()' );
+			$param ['perpagenum'] = $count; // 每页显示的数目
+			$param ['disnum'] = 7; // 取单数显示，当前页停在中间
+			$param ['curpage'] = $curpage; // 当前页码
+			$page = new MyClass_Page ( $param );
+			$page->setvar(array('goodsno' => $goodsno));
+			$this->view->page = $page->getNumPage ();
 
+			
+			$this->view->result = $result;
 
 		} catch ( Exception $e ) {
 			$this->feedback ( $e->getMessage (), '注意', 'javascript:window.history.back();', 'warning' );

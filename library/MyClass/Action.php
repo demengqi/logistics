@@ -30,7 +30,7 @@ class MyClass_Action extends Zend_Controller_Action {
 			$this->view->_user=$this->_user;
 
 			$user_can_action=explode(',',$this->_user->action_list);
-			if(!in_array($this->controller,$user_can_action) && $this->controller != 'index')
+			if(!in_array($this->controller,$user_can_action) && $this->controller != 'index' && $this->controller != 'ajax' )
 				$this->_redirect ( '/' );
 			
 			$this->view->user_can_action=$user_can_action;	

@@ -15,7 +15,6 @@ class AjaxController extends MyClass_Action {
 	//用户首页
 	public function indexAction() {
 		try {
-			
 		} catch ( Exception $e ) {
 			echo $e->getMessage ();
 			exit;
@@ -35,11 +34,11 @@ class AjaxController extends MyClass_Action {
 			if(empty($goodsno))
 				throw new Exception ( -2 );
 			
-			$sql='select * from goods where goodsno ="'.$goodsno.'"';
-			$result=$this->_dbAdapter->fetchAssoc($sql);
+			$sql='select * from goods_v where goodsno ="'.$goodsno.'"';
+			$result=$this->_dbAdapter->fetchAll($sql);
 			if(!$result)
 				throw new Exception ( -3 );
-			
+
 			$jsonArray=array('count'=>count($result),'result'=>$result);
 			
 			echo Zend_Json::encode($jsonArray);exit;	
