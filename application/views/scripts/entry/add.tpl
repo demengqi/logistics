@@ -1,3 +1,4 @@
+\
 <div class="main container" id="<*$controller*>">
   <div class="row">
     <div class="span2 bs-docs-sidebar "> <*include file="<*$controller*>/location.tpl"*> </div>

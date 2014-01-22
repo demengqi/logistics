@@ -17,8 +17,8 @@
         <link rel="stylesheet" href="/css/normalize.css">
         <link rel="stylesheet" href="/css/main.css">
         <link rel="stylesheet" href="/css/custom.css">
-        <script src="/js/vendor/jquery-1.9.1.min.js"></script>
-        <script src="/js/vendor/modernizr-2.6.2.min.js"></script>
+        <script src="/js/jquery.js"></script>
+        <script src="/js/modernizr-2.6.2.min.js"></script>
         <script src="/js/jquery.mb.browser.min.js"></script>
 
     <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
@@ -48,8 +48,9 @@
         <script src="/js/bootstrap.js"></script>
 		<script src="/js/plugins.js"></script>
         <script src="/js/main.js"></script>
-	<script src="/js/jquery.unveil.min.js"></script>
-  <script src="/js/jquery.scrollUp.min.js"></script>
+
+		<script src="/js/jquery.unveil.min.js"></script>
+		<script src="/js/jquery.scrollUp.min.js"></script>
     <script>
       $(document).ready(function(){
         $("img.lazy").unveil();
@@ -71,7 +72,5 @@
           });
     </script>
 
-    <script src="/js/holder.js"></script>
-    <script src="/js/application.js"></script> 
    </body>
 </html>

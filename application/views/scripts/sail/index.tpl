@@ -1,39 +1,41 @@
 <div id="<*$controller*>" class="span10">
-  <form action="/<*$controller*>/saveorder" method="post" class="form-horizontal">
+  <form action="/<*$controller*>/saveorder" method="post" class="form-horizontal" onsubmit="return checkit();">
     <div class="form-inline">
           <label>单据编号：
-            <input type="text" readonly="readonly" value="<*$orderno*>" name="orderno" class="input-small form-control span2">
+            <span class="input-small uneditable-input span2 disabled"><*$orderno*></span>
           </label>
        &nbsp;<label>操作员：
-          <input type="text"   readonly="readonly" value="<*$this->_user->workid*>" class="input-small form-control span1"></label>
+          <span class="input-small uneditable-input span2 disabled"><*$this->_user->workid*></span>
         &nbsp;<label>日期：
-          <input type="text"  readonly="readonly" name="day"  value="<*$date*>" class="input-small form-control span2"></label>
+          <span class="input-small uneditable-input span2 disabled"><*$date*></span>
        </div>
-     <input  type="text" class="input-xlarge"  placeholder="商品编号或条形码"  value="" id="goodsno" onkeyup="getfocus(event)"/>
-      
-      <input class="btn  btn-primary" type="button"  id="searchBtn" value="输入商品编号" onclick="getSearch(event)"/>
-      <hr />
-      <table id="tb1" class="table" >
+       
+      <table id="tb1" class="table table-striped table-bordered table-hover" >
         <tbody id="tbody1">
           <tr>
             <th>编号</th>
             <th>名称</th>
-            <th>型号(尺码)</th>
-            <th>数量</th>
             <th>单位</th>
+            <th>数量</th>
             <th>品牌</th>
+            <th>型号(尺码)</th>
             <th>售价</th>
-            <th>折扣</th>
-            <th>金额</th>
+            <th>合计</th>
             <th>&nbsp;</th>
           </tr>
         </tbody>
       </table>
-    <div class="readme">说明：数量为负数表示退货</div>
-    <div id="total"  > 合计数量 ：<span id="allnum">0</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;合计金额：&yen;<span id="allprice">0</span>&nbsp;&nbsp;&nbsp;
-      <input type="button" style="font-size:24px;" class="btn" value=" 收款 " onclick="shoukuan();"/>
-    </div>
-    <script type="text/javascript" src="/js/prototype.js"></script> 
+      <p style="text-align:right;">
+    <strong> 合计数量 ：<span id="allnum">0</span> &nbsp;&nbsp;&nbsp; 应收金额：&yen;<span id="alltrueprice">0</span>&nbsp;&nbsp;&nbsp;
+    实收金额：<span style="color:#F30">&yen;<span id="allprice" >0</span></span></strong>&nbsp;&nbsp;&nbsp;
+      <button class="btn btn-success" onclick="shoukuan();" id="shoukuanbtn" disabled="disabled" type="button"/><i class="icon-pencil icon-white"></i> 确认&收款 </button>
+    </p>
+    
+     <div class="alert alert-error"><small><strong>注意：</strong>&nbsp;&nbsp;说明：数量为负数表示退货</small></div>
+<div id="total" class="text-right">
+<small id="readme3" class="label-warning"></small>     <input  type="text" class="input-xlarge"  placeholder="商品编号或条形码"  value="" id="goodsno" onkeyup="getfocus(event)"/> <button class="btn btn-primary" id="searchBtn" onclick="checkgoods(event)" type="button"><i class="icon-search icon-white"></i> 输入商品编号</button>
+<div style="text-align:right; padding-right:40px;  height:13px;"><div id="ajax" style="display:none;" ><img src="/images/ajax_loader.gif" /></div></div>
+</div>
     <script type="text/javascript" >
 var maxArray=new Array()
 function getfocus(event){   
@@ -45,98 +47,105 @@ function getfocus(event){
 			   tmpEle=eval('goodsno');
 		 }   
 		 if(tmpEle.value==null || tmpEle.value==''){
-			  alert('请输入商品编号或名称');
+			 $('#readme3').html('请输入商品编号');
 			  $('goodsno').focus(); 
 			  event.returnValue = false;  
 			  return false;
 		 }
 		 
-		 processPost();
+		 checkgoods(event);
 
 	}
 	  
 }  
-function getSearch(event){   
+
+
+function checkgoods(event){   
 
 		 var tmpEle=document.getElementById('goodsno');
 		 if(tmpEle==null){
 			   tmpEle=eval('goodsno');
 		 }   
-		 if(tmpEle.value==null || tmpEle.value==''){
-			  alert('请输入商品编号或名称');
+		 if(tmpEle.value==null || tmpEle.value.trim()==''){
+			$('#readme3').html('请输入商品编号');
 			  event.returnValue = false;  
-			  $('goodsno').focus(); 
+			  $('#goodsno').focus(); 
 			  return false;
 		 }
 		 
-		 processPost();
+		var url = '/ajax/checkgoods';
+		var postdata = '';
+		document.getElementById('ajax').style.display='block';
+		//document.getElementById('readme2').innerHTML='';
+		$('#readme3').html('');
+		//var myAjax = new Ajax.Request( url, { method: 'post', parameters: pars, onComplete:showResponse_course});
+	
+		$.post(url,{goodsno:$('#goodsno').val().trim()},function(data){
+			document.getElementById('ajax').style.display='none';
+			
+			if(data == -1){
+				$('#readme3').html('系统方法错误');
+			  $('#goodsno').focus(); 
+			  $('#goodsno').select(); 
+
+				event.returnValue = false;  
+			}else if(data == -2){
+				$('#readme3').html('输入不能为空');
+				event.returnValue = false;  
+			}else if(data == -3){
+			//	alert('基本信息中无此编号的商品');
+				$('#readme3').html('无此编号的商品，请先添加商品信息');
+				event.returnValue = false;  
+			  $('#goodsno').focus(); 
+			  $('#goodsno').select(); 
+
+				
+			}else{
+				//alert(data);
+				var jsonArray =eval('(' + data + ')'); 
+			//	alert(jsonArray.result);
+				if(jsonArray.count==1){
+					//var result =eval('(' + jsonArray.result + ')'); 
+					//alert(result);
+					var  tabObj = document.getElementById("tbody1");
+					
+					var tdcontent='<tr>';
+					tdcontent +='<td>'+jsonArray.result[0].goodsno+'</td>';
+					tdcontent +='<td>'+jsonArray.result[0].goodsname+'</td>';
+					tdcontent +='<td>'+jsonArray.result[0].unitname+'</td>';
+					tdcontent +='<td><input type="text" class="input-small" style="width:40px;text-align:center" value="1"  id="goodsnum_'+jsonArray.result[0].goodsid+'" name="goodsnum[]" onKeyUp="cal(\''+jsonArray.result[0].goodsid+'\')"></td>';
+					tdcontent +='<td>'+jsonArray.result[0].brandname+'</td>';
+					tdcontent +='<td>'+jsonArray.result[0].xinghao+'</td>';
+					tdcontent +='<td><input type="text" class="input-small" style="text-align:right" value="'+jsonArray.result[0].outprice+'"  id="price_'+jsonArray.result[0].goodsid+'" name="price[]" onKeyUp="cal(\''+jsonArray.result[0].goodsid+'\')" > <input type="hidden"  value="'+jsonArray.result[0].outprice+'"  name="trueprice[]" ></td>';
+					tdcontent +='<td id="allprice_'+jsonArray.result[0].goodsid+'">'+jsonArray.result[0].outprice+'</td>';
+					tdcontent +='<td><button onclick="del(this)" type="button" class="btn btn-link" title="删除"><i class="icon-remove"></i></button><input type="hidden" name="goodsid[]" value="'+jsonArray.result[0].goodsid+'"><input type="hidden" name="goodsno[]" id="goodsno_'+jsonArray.result[0].goodsid+'" value="'+jsonArray.result[0].goodsno+'"><input type="hidden" id="maxnum_'+jsonArray.result[0].goodsid+'" value="'+jsonArray.result[0].goodsnum+'"></td></tr>';
+					
+					maxArray[jsonArray.result[0].goodsid]=jsonArray.result[0].goodsnum;
+				//	alert(maxArray[jsonArray.result[0].goodsid]);
+					
+					//var rowLength = tabObj.rows.length;
+	
+					//var lastTr = tabObj.rows[rowLength-1];
+					//lastTr.parentNode.insertBefore(tdcontent,lastTr);
+	
+					tabObj.insertRow(tabObj.rows.length).innerHTML = tdcontent;
+					 calAll();	
+			  $('#goodsno').focus(); 
+			  $('#goodsno').val(''); 
+				
+				}else{
+					$('#readme3').html('多于一个商品，请确认');
+				}
+				
+			}
+			//
+		 });
+
 	  
 }  
 
+  /*
   
-  
-   	function processPost()
-	{
-
-		var v = $F('goodsno');
-
-		var url = '/<*$controller*>/checkgoods';
-		var pars = 'goodsno=' + v;
-
-		var myAjax = new Ajax.Request( url, { method: 'post', parameters: pars, onComplete:showResponse_button});
-	}
-	function showResponse_button(originalRequest)
-	{
-		
-		if(originalRequest.responseText==-1 ){
-			 alert('系统方法错误');
-			$('goodsno').focus(); 
-			$('goodsno').select(); 
-			event.returnValue = false;  
-		}else if(originalRequest.responseText==-2 ){
-			 alert('输入不能为空');
-			$('goodsno').focus(); 
-			$('goodsno').select(); 
-			event.returnValue = false;  
-		}else if(originalRequest.responseText==-3){
-		 //查询数据库
-			 alert('基本信息中无此编号的商品,或没有库存');
-			$('goodsno').focus(); 
-			$('goodsno').select(); 
-			event.returnValue = false;  
-			
-    	}else{
-			
-
-			var jsonArray =eval('(' + originalRequest.responseText + ')');       
-			if(jsonArray.count==1){
-				//增加 行
-				
-				var  tabObj = document.getElementById("tbody1");
-				
-				var tdcontent='<tr id="g'+jsonArray.result[0].goodsid+'">';
-				tdcontent +='<td>'+jsonArray.result[0].goodsno+'</td>';
-				tdcontent +='<td>'+jsonArray.result[0].goodsname+'</td>';
-				tdcontent +='<td>'+jsonArray.result[0].xinghao+'</td>';
-				tdcontent +='<td><input type="text" class="txt" style="width:40px;text-align:center" value="1"  id="goodsnum_'+jsonArray.result[0].goodsid+'" name="goodsnum[]" onKeyUp="cal(\''+jsonArray.result[0].goodsid+'\')"></td>';
-				tdcontent +='<td>'+jsonArray.result[0].unitname+'</td>';
-				tdcontent +='<td>'+jsonArray.result[0].brandname+'</td>';
-				tdcontent +='<td><input type="text" class="txt" style="width:80px;text-align:right" value="'+jsonArray.result[0].price+'"  id="price_'+jsonArray.result[0].goodsid+'" name="price[]" onKeyUp="cal(\''+jsonArray.result[0].goodsid+'\')" ></td>';
-				tdcontent +='<td>'+jsonArray.result[0].discount+'</td>';
-				tdcontent +='<td id="allprice_'+jsonArray.result[0].goodsid+'">'+jsonArray.result[0].price+'</td>';
-				tdcontent +='<td><input type="button" value="删除" name="B1" class="btn" onclick="del(this)"><input type="hidden" name="goodsid[]" value="'+jsonArray.result[0].goodsid+'"><input type="hidden" name="goodsno[]" id="goodsno_'+jsonArray.result[0].goodsid+'" value="'+jsonArray.result[0].goodsno+'"><input type="hidden" name="discount[]" value="'+jsonArray.result[0].discount+'"><input type="hidden" id="maxnum_'+jsonArray.result[0].goodsid+'" value="'+jsonArray.result[0].goodsnum+'"></td></tr>';
-				
-				maxArray[jsonArray.result[0].goodsid]=jsonArray.result[0].goodsnum;
-			//	alert(maxArray[jsonArray.result[0].goodsid]);
-				
-				//var rowLength = tabObj.rows.length;
-
-				//var lastTr = tabObj.rows[rowLength-1];
-				//lastTr.parentNode.insertBefore(tdcontent,lastTr);
-
-				tabObj.insertRow(tabObj.rows.length).innerHTML = tdcontent;
-				 calAll();
-				
 			}else if(jsonArray.count>1){
 
 				
@@ -182,15 +191,20 @@ function getSearch(event){
 				$('goodsno').focus(); 
 		}
 	} 
-
+*/
 	
-function del(o){
+function del(obj){
 	if(confirm("确认要删除?")){
-		var t=document.getElementById('tbody1')
-		t.deleteRow(o.parentNode.parentNode.rowIndex);
+	//	var t=document.getElementById('tbody1')
+	//	t.deleteRow(obj.parentNode.parentNode.rowIndex);
+		$(obj).closest('tr').remove()
 		calAll();
-		$('goodsno').value='';
-		$('goodsno').focus(); 
+	//$(obj).parent().parent().remove();
+	//alert(id);
+	//$(obj).parent('td').parent('tr').remove();  
+		$('#goodsno').val('');
+		$('#goodsno').focus(); 
+
 	}
 }
 
@@ -201,84 +215,91 @@ function selected(goodsno){
 
 
 window.onload = function() {
-  document.getElementById("goodsno").focus();
+  $('#goodsno').focus(); 
 }
+
 function calAll(){
 	var  goodsnum = document.getElementsByName("goodsnum[]") ;
 	var  price = document.getElementsByName("price[]") ;
+	var  trueprice = document.getElementsByName("trueprice[]") ;
+	
         var allnum=0;
         var allprice=0;
+        var alltrueprice=0;
         for (var i=0;i<goodsnum.length;i++ )
-        {           
-            allnum +=Number(goodsnum[i].value);
-			allprice +=Number(goodsnum[i].value)*Number(price[i].value);
+        {   
+			var goodsnum_tmp= Number(goodsnum[i].value);      
+			if (goodsnum_tmp<0)
+				goodsnum_tmp=0-goodsnum_tmp;
+				
+            allnum +=Number(goodsnum_tmp);
+			allprice +=Number(Number(goodsnum[i].value))*Number(price[i].value);
+			alltrueprice +=Number(Number(goodsnum[i].value))*Number(trueprice[i].value);
         }
 	
+	$('#allnum').html(Number(allnum));
+	$('#allprice').html(Number(allprice).toFixed(2));
+	$('#alltrueprice').html(Number(alltrueprice).toFixed(2));
 
-	$('allnum').innerHTML=Number(allnum);
-	$('allprice').innerHTML=Number(allprice).toFixed(2);
-
+	if(Number(allnum)>0 ){
+		$('#shoukuanbtn').prop("disabled",false);
+	}else{
+		$('#shoukuanbtn').prop("disabled","disabled");
+	}
 }
 
 function cal(id){
-	if(parseInt($('price_'+id).value)<0){
+	var id_price=parseInt($('#price_'+id).val());
+	
+	if(id_price<0){
 		alert('金额不能为负数');
-		$('price_'+id).value=0;
+		$('#price_'+id).val(0);
 		return false;
 	}
 	//parseInt($('valuemaxnum_'+id).
 	//获取每产品最大数
 	//var goodsidlist=$F('goodsid');
+	/*
 	var goodsidlist=documnet.getElementByName('goodsid');
 	for (i=0;i<goodsidlist.length;i++){
 		var xid=goodsidlist[i];
 		alert(xid);
+		*/
 		/*
 		maxArray[id]=parseInt(maxArray[id])-parseInt($('goodsnum_'+xid).value);
 		if(parseInt(maxArray[id])<=0){
 			alert($('goodsno_'+xid).value+'超过数量，请修改');
 			return false;
 		}
-		*/
+		
 	}
-	
+	*/
 
-	var allproce=parseInt($('goodsnum_'+id).value)*parseInt($('price_'+id).value);
-	$('allprice_'+id).innerHTML=parseInt(allproce).toFixed(2);
+	var allproce=parseInt($('#goodsnum_'+id).val())*parseInt($('#price_'+id).val());
+	$('#allprice_'+id).html(allproce.toFixed(2));
 	calAll();
 }
-</script>
-    <link rel="stylesheet" href="/css/modal.css" type="text/css" />
-    <script type="text/javascript" src="/js/dhtmlwindow.js"></script> 
-    <script type="text/javascript" src="/js/modal.js"></script> 
-    <script type="text/javascript">
+
 
 function showGoods(){
 
 } 
-function shoukuan(){
-		var  goodsnum = document.getElementsByName("goodsnum[]") ;
-        var allprice=0;
-		if(goodsnum.length==0){
-        	alert('请先选择商品');
-			$('goodsno').focus(); 
-			return false;
-        }
 
-	
-	
-	divwindow1=dhtmlmodal.open('EmailBox1', 'div', 'showFrame1', '结算中心', 'width=380px, height=380px, center=1, resize=0, scrolling=0');
-	$('yingshou').setValue($('allprice').innerHTML);
-	$('shishou').setValue($('allprice').innerHTML);
-	
-		$('laikuan').focus(); 
-		$('laikuan').select(); 
-	divwindow1.onclose=function(){
-		//document.getElementById('yingshou').value=yingshou;
-		//alert($('yingshou').value);
-		return true;
-	}
-} 
+function shoukuan(){
+	$(document).ready(function(){
+	 //  $(".addnew").click(function(){ // Click to only happen on announce links
+	 var shishou=$('#allprice').html();
+	 var alltrueprice=$('#alltrueprice').html();
+		 $("#yingshou").val(alltrueprice);
+		 $("#shishou").val(shishou);
+ 		 $('#laikuan').focus(); 
+		 $('#myModal').modal('show');
+
+	  // });
+	});
+				
+}
+
 
 function saveit(){
 	var laikuan=$('laikuan').value;
@@ -299,74 +320,80 @@ function saveit(){
 	$('order').submit();
 	return true;
 }
-function getfocusMoney(event){   
-	e = event ? event :(window.event ? window.event : null);
 
-    if(e.keyCode==13){
-		var laikuan=$('laikuan').value;
-		var shishou=$('shishou').value;
-		if(laikuan==0){
-			alert('请填写来款金额！');
-			$('laikuan').focus(); 
-			return false;	}
+function zhaohuikuan(){   
+		var laikuan=$('#laikuan').val();
+		var shishou=$('#shishou').val();
 		var zhaohui=Number(laikuan)-Number(shishou);
-		$('zhaohui').setValue(zhaohui.toFixed(2));
+		$('#zhaohui').val(zhaohui.toFixed(2));
 
-		if(Number(laikuan)<Number(shishou)){
+		/*if(Number(laikuan)<Number(shishou)){
 			if(!confirm(laikuan+'来款金额小于实收金额'+shishou+'，是否允许欠款？')){
 				$('laikuan').focus(); 
 				$('laikuan').select(); 
 				return false;
 			}
 		}
-
-	}
-	  
+		*/
 } 
 
 
 
 </script> 
     <!-- 动态弹出窗口代码 结束 -->
-    <div id="showFrame" style="display:none" class="showFrame">
-      <div id="showgoods"> </div>
+    
+    <!-- Modal -->
+<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+      <h3 id="myModalLabel">收款过账</h3>
     </div>
-    <div id="showFrame1" style="display:none" class="showFrame">
-    <div id="jiesuan">
-      <h1>收款过账</h1>
-      <dl>
-        <dt>应收金额：</dt>
-        <dd>
-          <input type="text" id="yingshou" name="yingshou"  readonly="readonly" value="0" class="txt">
-          （元）</dd>
-        <dt>实收金额：</dt>
-        <dd>
-          <input type="text" id="shishou" name="shishou" value="" class="txt">
-          （元）</dd>
-        <dt>现金来款：</dt>
-        <dd>
-          <input type="text" id="laikuan"  name="laikuan" value="" class="txt"  onkeypress="getfocusMoney(event)">
-          （元）</dd>
-        <dt>找回金额：</dt>
-        <dd>
-          <input type="text" id="zhaohui" name="zhaohui" readonly="readonly" class="txt">
-          （元）</dd>
-        <dt>支付方式：</dt>
-        <dd>
-          <input type="radio" name="paytype" id="paytype1" value="1" checked="checked"/>
-          <label for="paytype1">现金</label>
-          <input type="radio" name="paytype" id="paytype2" value="2" />
-          <label for="paytype2">刷卡</label>
-        </dd>
-      </dl>
-      <div class="opbtn">
-        <input value="废弃此单" type="button" class="btn" onclick="if(confirm('要废弃此单?')){window.location.reload();}else return false;" />
-        &nbsp;&nbsp;&nbsp;
-        <input value="返回修改" type="button" class="btn" onclick="parent.EmailBox1.hide();" />
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <input value="确认过账" style="font-size:16px; color:#ff3300"  type="button" class="btn" onclick="saveit()" />
+    <div class="modal-body">
+      <div class="control-group">
+        <label class="control-label" for="yingshou">应收金额：</label>
+        <div class="controls">
+          <label><input type="text" name="yingshou" value=""  class="input-medium" id="yingshou" placeholder="0"  readonly="readonly"/> 元</label>
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="shishou">实收金额：</label>
+        <div class="controls">
+          <label><input type="text" name="shishou" value=""  class="input-medium" id="shishou" placeholder="0" readonly="readonly" /> 元</label>
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="laikuan">现金来款：</label>
+        <div class="controls">
+          <label><input type="text" name="laikuan" value="" class="input-medium" id="laikuan" placeholder="输入现金来款" onkeyup="zhaohuikuan()"/> 元</label>
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="zhaohui">找回金额：</label>
+        <div class="controls">
+          <label><input type="text" name="zhaohui" value="0" class="input-medium" id="zhaohui" placeholder="0" readonly="readonly" /> 元</label>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">支付方式</label>
+        <div class="controls">
+           <label for="paytype1" class="radio inline"><input type="radio" name="paytype" id="paytype1"  value="1" checked="checked"/>
+         现金</label>
+          <label for="paytype2" class="radio inline" ><input type="radio" name="paytype" id="paytype2"  value="2" />
+          刷卡</label>
+        </div>
       </div>
     </div>
-  </form>
+    <div class="modal-footer">
+        <input value="废弃此单" type="button" class="btn" onclick="if(confirm('要废弃此单?')){window.location.reload();}else return false;" />
+        &nbsp;&nbsp;&nbsp;
+        <button class="btn" data-dismiss="modal" aria-hidden="true">返回修改</button>
+        &nbsp;&nbsp;&nbsp;
+      <button type="submit" class="btn btn-primary">确认过账</button>
+    </div>
 </div>
+
+
+
+  </form>
 </div>
