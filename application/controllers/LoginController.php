@@ -63,7 +63,7 @@ class LoginController extends MyClass_Action {
 				$auth->getStorage ()->write ( $authAdapter->getResultRowObject ( array ('id','workid','username','action_list') ) );
 				 
 				//更新登陆信息
-			 	$sql = 'update users set login_num=login_num+1, lasttime='.time().' where id=' . $auth->getStorage ()->read ()->id;
+			 	$sql = 'update users set login_num=login_num+1, lasttime="'.date('Y-m-d H:i:s').'" where id=' . $auth->getStorage ()->read ()->id;
 				$this->_dbAdapter ->query ( $sql );
 				
 			

@@ -2,12 +2,12 @@
   <form action="/<*$controller*>/saveorder" method="post" class="form-horizontal" onsubmit="return checkit();">
     <div class="form-inline">
           <label>单据编号：
-            <span class="input-small uneditable-input span2 disabled"><*$orderno*></span>
+            <input type="text" class="input span2 disabled" readonly="readonly" value="<*$orderno*>" name="orderno">
           </label>
        &nbsp;<label>操作员：
-          <span class="input-small uneditable-input span2 disabled"><*$this->_user->workid*></span>
+          <input type="text" class="input span2 disabled" readonly="readonly" value="<*$this->_user->workid*>" name="workid">
         &nbsp;<label>日期：
-          <span class="input-small uneditable-input span2 disabled"><*$date*></span>
+          <input type="text" class="input span2 disabled" readonly="readonly" value="<*$date*>" name="day" >
        </div>
        
       <table id="tb1" class="table table-striped table-bordered table-hover" >
@@ -31,13 +31,17 @@
       <button class="btn btn-success" onclick="shoukuan();" id="shoukuanbtn" disabled="disabled" type="button"/><i class="icon-pencil icon-white"></i> 确认&收款 </button>
     </p>
     
-     <div class="alert alert-error"><small><strong>注意：</strong>&nbsp;&nbsp;说明：数量为负数表示退货</small></div>
-<div id="total" class="text-right">
+     <div class="alert alert-error"><small><strong><i class="icon-volume-up"></i> 注意：</strong>&nbsp;&nbsp;超过库存将不能销售</small></div>
+<div id="total" class="text-right info">
 <small id="readme3" class="label-warning"></small>     <input  type="text" class="input-xlarge"  placeholder="商品编号或条形码"  value="" id="goodsno" onkeyup="getfocus(event)"/> <button class="btn btn-primary" id="searchBtn" onclick="checkgoods(event)" type="button"><i class="icon-search icon-white"></i> 输入商品编号</button>
 <div style="text-align:right; padding-right:40px;  height:13px;"><div id="ajax" style="display:none;" ><img src="/images/ajax_loader.gif" /></div></div>
 </div>
     <script type="text/javascript" >
-var maxArray=new Array()
+var maxArrayId=new Array();
+var maxArrayNum=new Array();
+var currentArrayNum=new Array();
+var rownum=1;
+
 function getfocus(event){   
 	e = event ? event :(window.event ? window.event : null);
 
@@ -89,16 +93,18 @@ function checkgoods(event){
 			  $('#goodsno').select(); 
 
 				event.returnValue = false;  
+				return 0;
 			}else if(data == -2){
 				$('#readme3').html('输入不能为空');
 				event.returnValue = false;  
+				return 0;
 			}else if(data == -3){
 			//	alert('基本信息中无此编号的商品');
 				$('#readme3').html('无此编号的商品，请先添加商品信息');
 				event.returnValue = false;  
 			  $('#goodsno').focus(); 
 			  $('#goodsno').select(); 
-
+				return 0;
 				
 			}else{
 				//alert(data);
@@ -107,34 +113,49 @@ function checkgoods(event){
 				if(jsonArray.count==1){
 					//var result =eval('(' + jsonArray.result + ')'); 
 					//alert(result);
+					
 					var  tabObj = document.getElementById("tbody1");
 					
 					var tdcontent='<tr>';
 					tdcontent +='<td>'+jsonArray.result[0].goodsno+'</td>';
 					tdcontent +='<td>'+jsonArray.result[0].goodsname+'</td>';
 					tdcontent +='<td>'+jsonArray.result[0].unitname+'</td>';
-					tdcontent +='<td><input type="text" class="input-small" style="width:40px;text-align:center" value="1"  id="goodsnum_'+jsonArray.result[0].goodsid+'" name="goodsnum[]" onKeyUp="cal(\''+jsonArray.result[0].goodsid+'\')"></td>';
+					tdcontent +='<td>1<input type="hidden" value="1"  id="goodsnum_'+rownum+'" name="goodsnum[]" ></td>';
 					tdcontent +='<td>'+jsonArray.result[0].brandname+'</td>';
 					tdcontent +='<td>'+jsonArray.result[0].xinghao+'</td>';
-					tdcontent +='<td><input type="text" class="input-small" style="text-align:right" value="'+jsonArray.result[0].outprice+'"  id="price_'+jsonArray.result[0].goodsid+'" name="price[]" onKeyUp="cal(\''+jsonArray.result[0].goodsid+'\')" > <input type="hidden"  value="'+jsonArray.result[0].outprice+'"  name="trueprice[]" ></td>';
-					tdcontent +='<td id="allprice_'+jsonArray.result[0].goodsid+'">'+jsonArray.result[0].outprice+'</td>';
-					tdcontent +='<td><button onclick="del(this)" type="button" class="btn btn-link" title="删除"><i class="icon-remove"></i></button><input type="hidden" name="goodsid[]" value="'+jsonArray.result[0].goodsid+'"><input type="hidden" name="goodsno[]" id="goodsno_'+jsonArray.result[0].goodsid+'" value="'+jsonArray.result[0].goodsno+'"><input type="hidden" id="maxnum_'+jsonArray.result[0].goodsid+'" value="'+jsonArray.result[0].goodsnum+'"></td></tr>';
+					tdcontent +='<td><input type="text" class="input-small" style="text-align:right" value="'+jsonArray.result[0].outprice+'"  id="price_'+rownum+'" name="price[]" onKeyUp="cal('+rownum+')" > <input type="hidden"  value="'+jsonArray.result[0].outprice+'"  name="trueprice[]" ></td>';
+					tdcontent +='<td id="allprice_'+rownum+'">'+jsonArray.result[0].outprice+'</td>';
+					tdcontent +='<td><button onclick="del(this,'+jsonArray.result[0].goodsid+')" type="button" class="btn btn-link" title="删除"><i class="icon-remove"></i></button><input type="hidden" name="goodsid[]" value="'+jsonArray.result[0].goodsid+'"><input type="hidden" name="goodsno[]" id="goodsno_'+rownum+'" value="'+jsonArray.result[0].goodsno+'"></td></tr>';
 					
-					maxArray[jsonArray.result[0].goodsid]=jsonArray.result[0].goodsnum;
+					var _exist=$.inArray(jsonArray.result[0].goodsid,maxArrayId);
+					if(_exist<0){
+						maxArrayNum[maxArrayId.length]=jsonArray.result[0].goodsnum;
+						currentArrayNum[maxArrayId.length]=1;
+						maxArrayId[maxArrayId.length]=jsonArray.result[0].goodsid;
+						_exist=0;
+					}else{
+						currentArrayNum[_exist]++;
+					}
+					//alert(currentArray[jsonArray.result[0].goodsid]);
 				//	alert(maxArray[jsonArray.result[0].goodsid]);
-					
-					//var rowLength = tabObj.rows.length;
-	
-					//var lastTr = tabObj.rows[rowLength-1];
-					//lastTr.parentNode.insertBefore(tdcontent,lastTr);
+					if(Number(currentArrayNum[_exist])> Number(maxArrayNum[_exist])){
+						$('#readme3').html('商品库存为0，不能销售');
+							event.returnValue = false;  
+						  $('#goodsno').focus(); 
+						  $('#goodsno').select(); 
+						  return 0;
+					}
+				//	alert(Number(currentArrayNum[_exist])+'>'+Number(maxArrayNum[_exist]));
 	
 					tabObj.insertRow(tabObj.rows.length).innerHTML = tdcontent;
-					 calAll();	
+					rownum++;
+					calAll();	
 			  $('#goodsno').focus(); 
 			  $('#goodsno').val(''); 
-				
+				return 1;
 				}else{
 					$('#readme3').html('多于一个商品，请确认');
+					return 0;
 				}
 				
 			}
@@ -193,10 +214,16 @@ function checkgoods(event){
 	} 
 */
 	
-function del(obj){
+function del(obj,goodsid){
 	if(confirm("确认要删除?")){
 	//	var t=document.getElementById('tbody1')
 	//	t.deleteRow(obj.parentNode.parentNode.rowIndex);
+					var _exist=$.inArray(goodsid,maxArrayId);
+					alert(_exist);
+					if(_exist>=0){
+						currentArrayNum[_exist]--;
+					}
+	
 		$(obj).closest('tr').remove()
 		calAll();
 	//$(obj).parent().parent().remove();
@@ -248,42 +275,20 @@ function calAll(){
 	}
 }
 
-function cal(id){
-	var id_price=parseInt($('#price_'+id).val());
+function cal(rownum,id){
+	var id_price=parseInt($('#price_'+rownum).val());
 	
 	if(id_price<0){
 		alert('金额不能为负数');
-		$('#price_'+id).val(0);
+		$('#price_'+rownum).val(0);
 		return false;
 	}
-	//parseInt($('valuemaxnum_'+id).
-	//获取每产品最大数
-	//var goodsidlist=$F('goodsid');
-	/*
-	var goodsidlist=documnet.getElementByName('goodsid');
-	for (i=0;i<goodsidlist.length;i++){
-		var xid=goodsidlist[i];
-		alert(xid);
-		*/
-		/*
-		maxArray[id]=parseInt(maxArray[id])-parseInt($('goodsnum_'+xid).value);
-		if(parseInt(maxArray[id])<=0){
-			alert($('goodsno_'+xid).value+'超过数量，请修改');
-			return false;
-		}
-		
-	}
-	*/
-
-	var allproce=parseInt($('#goodsnum_'+id).val())*parseInt($('#price_'+id).val());
-	$('#allprice_'+id).html(allproce.toFixed(2));
+	
+	var allproce=parseInt($('#goodsnum_'+rownum).val())*parseInt($('#price_'+rownum).val());
+	$('#allprice_'+rownum).html(allproce.toFixed(2));
 	calAll();
 }
 
-
-function showGoods(){
-
-} 
 
 function shoukuan(){
 	$(document).ready(function(){
@@ -327,14 +332,11 @@ function zhaohuikuan(){
 		var zhaohui=Number(laikuan)-Number(shishou);
 		$('#zhaohui').val(zhaohui.toFixed(2));
 
-		/*if(Number(laikuan)<Number(shishou)){
-			if(!confirm(laikuan+'来款金额小于实收金额'+shishou+'，是否允许欠款？')){
-				$('laikuan').focus(); 
-				$('laikuan').select(); 
-				return false;
-			}
+		if(Number(laikuan)<Number(shishou)){
+			$('#isoksubmit').prop("disabled",true);
+		}else{
+			$('#isoksubmit').prop("disabled",false);
 		}
-		*/
 } 
 
 
@@ -361,7 +363,7 @@ function zhaohuikuan(){
           <label><input type="text" name="shishou" value=""  class="input-medium" id="shishou" placeholder="0" readonly="readonly" /> 元</label>
         </div>
       </div>
-      <div class="control-group">
+      <div class="control-group info">
         <label class="control-label" for="laikuan">现金来款：</label>
         <div class="controls">
           <label><input type="text" name="laikuan" value="" class="input-medium" id="laikuan" placeholder="输入现金来款" onkeyup="zhaohuikuan()"/> 元</label>
@@ -374,7 +376,7 @@ function zhaohuikuan(){
         </div>
       </div>
 
-      <div class="control-group">
+      <div class="control-group info">
         <label class="control-label">支付方式</label>
         <div class="controls">
            <label for="paytype1" class="radio inline"><input type="radio" name="paytype" id="paytype1"  value="1" checked="checked"/>
@@ -383,13 +385,15 @@ function zhaohuikuan(){
           刷卡</label>
         </div>
       </div>
+           <div class="alert alert-error"><small><i class="icon-volume-up"></i> 来款小于实收将不允许过账</small></div>
+
     </div>
     <div class="modal-footer">
         <input value="废弃此单" type="button" class="btn" onclick="if(confirm('要废弃此单?')){window.location.reload();}else return false;" />
         &nbsp;&nbsp;&nbsp;
         <button class="btn" data-dismiss="modal" aria-hidden="true">返回修改</button>
         &nbsp;&nbsp;&nbsp;
-      <button type="submit" class="btn btn-primary">确认过账</button>
+      <button type="submit" class="btn btn-primary" disabled="disabled" id="isoksubmit">确认过账</button>
     </div>
 </div>
 
