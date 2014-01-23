@@ -101,7 +101,7 @@ class EntryController extends MyClass_Action {
 				if(!$goodsid)
 					throw new Exception ( '该商品不存在，请重新确认！' );
 
-			$p['addtime']=date('Y-m-d H:i:s');
+			$p['addtime']=time();
 			$p['adddate']=date('Y-m-d');
 			$p['adduserid']=$this->_user->id;
 				

@@ -28,12 +28,10 @@ class SailController extends MyClass_Action {
 	
 	/*
 	处理订单
-
 Array
 (
-    [orderno] => 20140123001001
-    [workid] => 01
-    [day] => 2014-01-23
+    [orderno] => 20130805001001
+    [day] => 2013-08-05
     [goodsnum] => Array
         (
             [0] => 1
@@ -41,35 +39,20 @@ Array
 
     [price] => Array
         (
-            [0] => 12.00
+            [0] => 80.00
         )
 
-    [trueprice] => Array
-        (
-            [0] => 12.00
-        )
-
-    [goodsid] => Array
-        (
-            [0] => 3
-        )
-
-    [goodsno] => Array
-        (
-            [0] => 001
-        )
-
-    [yingshou] => 12.00
-    [shishou] => 12.00
+    [yingshou] => 80.00
+    [shishou] => 80.00
     [laikuan] => 100
-    [zhaohui] => 88.00
+    [zhaohui] => 20.00
     [paytype] => 1
 )
+
 
 	*/
 	public function saveorderAction(){
 		try {
-			
 			if (! $this->isPost ()) {
 					throw new Exception ( -1 );
 			}
@@ -79,11 +62,8 @@ Array
 			if(!isset($p['goodsid']) || !is_array($p['goodsid']))
 				throw new Exception ('参数错误');
 			
-			$this->_dbAdapter->query("BEGIN"); 
-
-			$datetime=date('Y-m-d H:i:s');
-			$data=array(
-			    'orderno'=>$p['orderno'],
+			$time=time();
+			$data=array('orderno'=>$p['orderno'],
 				'day'=>$p['day'],
 				'yingshou'=>$p['yingshou'],
 				'shishou'=>$p['shishou'],
@@ -92,13 +72,11 @@ Array
 				'paytype'=>$p['paytype'],
 				'opuserid'=>$this->_user->id,
 				'workid'=>$this->_user->workid,
-				'addtime'=>$datetime,
+				'addtime'=>$time,
 			);
 			$result=$this->_dbAdapter->insert('orders',$data);
-			if(!$result){
-				$this->_dbAdapter->query("ROLLBACK"); 
+			if(!$result)
 				throw new Exception ('保存失败或已保存');
-			}
 			$insertid=$this->_dbAdapter->lastInsertId();
 			
 			$i=0;
@@ -109,26 +87,23 @@ Array
 					'goodsno'=>$p['goodsno'][$key],
 					'goodsnum'=>$p['goodsnum'][$key],
 					'price'=>$p['price'][$key],
-					'trueprice'=>$p['trueprice'][$key],
-					'discount'=>1,
+					'discount'=>$p['discount'][$key],
 					'adduserid'=>$this->_user->id,
-					'addtime'=>$datetime,
+					'addtime'=>$time,
 				);
 				$result=$this->_dbAdapter->insert('sails',$data);
 				if($result){
 					$i++;
 				    $this->_dbAdapter->query('update goods set goodsnum=goodsnum-'.$p['goodsnum'][$key].' where goodsid='.$value);
-				}else{
-					break;
+						
 				}
 			}
 			if($i==count($p['goodsid'])){
-				$this->_dbAdapter->query("COMMIT"); 
-
+				
 				$this->feedback ( '订单处理成功', '恭喜', '/'.$this->controller, 'warning' );
 			}else{
-				$this->_dbAdapter->query("ROLLBACK"); 
-				
+				$this->_dbAdapter->delete('sails','orderid='.$insertid);
+				$this->_dbAdapter->delete('orders','orderid='.$insertid);
 				throw new Exception ('操作失败');
 			}
 			

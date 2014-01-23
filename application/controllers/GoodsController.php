@@ -106,7 +106,7 @@ class GoodsController extends MyClass_Action {
 				$p[$key]=addslashes(trim($value));
 			}
 			
-			$p['addtime']=date('Y-m-d H:i:s');
+			$p['addtime']=time();
 			if(empty($p['goodsno']))
 				throw new Exception ( '不能为空！' );
 			if(empty($p['goodsname']))
@@ -211,7 +211,7 @@ class GoodsController extends MyClass_Action {
 						$data[$key1]=addslashes(trim($value1[$key]));
 					}
 				}
-				$data['lasttime']=date('Y-m-d H:i:s');
+				$data['lasttime']=time();
 				//$this->log(Zend_Debug::dump($data,'data',0));
 				$this->log(var_export ( $data, true ));
 				if(!isset($data['isover']))
