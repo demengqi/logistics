@@ -14,7 +14,7 @@ class IndexController extends MyClass_Action {
 	public function indexAction() {
 		try {
 
-		
+		$this->_redirect ( '/sail' );
 		} catch ( Exception $e ) {
 			$this->feedback ( $e->getMessage (), '注意', 'javascript:window.history.back();', 'warning' );
 		}

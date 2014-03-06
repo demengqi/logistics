@@ -1,13 +1,13 @@
 <div id="<*$controller*>" class="span10">
-  <form action="/<*$controller*>/saveorder" method="post" class="form-horizontal" onsubmit="return checkit();">
+  <form action="/<*$controller*>/saveorder" method="post" class="form-horizontal" onsubmit="return saveit();">
     <div class="form-inline">
           <label>单据编号：
-            <span class="input-small uneditable-input span2 disabled"><*$orderno*></span>
+            <input name="orderno" class="input-small uneditable-input span2 disabled" value="<*$orderno*>">
           </label>
        &nbsp;<label>操作员：
-          <span class="input-small uneditable-input span2 disabled"><*$this->_user->workid*></span>
+          <input name="adduserid" class="input-small uneditable-input span2 disabled" value="<*$this->_user->workid*>"></label>
         &nbsp;<label>日期：
-          <span class="input-small uneditable-input span2 disabled"><*$date*></span>
+          <input name="day" class="input-small uneditable-input span2 disabled" value="<*$date*>"></label>
        </div>
        
       <table id="tb1" class="table table-striped table-bordered table-hover" >
@@ -31,7 +31,7 @@
       <button class="btn btn-success" onclick="shoukuan();" id="shoukuanbtn" disabled="disabled" type="button"/><i class="icon-pencil icon-white"></i> 确认&收款 </button>
     </p>
     
-     <div class="alert alert-error"><small><strong>注意：</strong>&nbsp;&nbsp;说明：数量为负数表示退货</small></div>
+     <!-- div class="alert alert-error"><small><strong>注意：</strong>&nbsp;&nbsp;说明：数量必须大于0</small></div -->
 <div id="total" class="text-right">
 <small id="readme3" class="label-warning"></small>     <input  type="text" class="input-xlarge"  placeholder="商品编号或条形码"  value="" id="goodsno" onkeyup="getfocus(event)"/> <button class="btn btn-primary" id="searchBtn" onclick="checkgoods(event)" type="button"><i class="icon-search icon-white"></i> 输入商品编号</button>
 <div style="text-align:right; padding-right:40px;  height:13px;"><div id="ajax" style="display:none;" ><img src="/images/ajax_loader.gif" /></div></div>
@@ -89,16 +89,20 @@ function checkgoods(event){
 			  $('#goodsno').select(); 
 
 				event.returnValue = false;  
+				  return false;
+				
 			}else if(data == -2){
 				$('#readme3').html('输入不能为空');
 				event.returnValue = false;  
+				  return false;
+				
 			}else if(data == -3){
 			//	alert('基本信息中无此编号的商品');
 				$('#readme3').html('无此编号的商品，请先添加商品信息');
 				event.returnValue = false;  
 			  $('#goodsno').focus(); 
 			  $('#goodsno').select(); 
-
+ 						  return false;
 				
 			}else{
 				//alert(data);
@@ -107,6 +111,23 @@ function checkgoods(event){
 				if(jsonArray.count==1){
 					//var result =eval('(' + jsonArray.result + ')'); 
 					//alert(result);
+					
+					//缺货
+					if(jsonArray.result[0].goodsnum<=0){
+						$('#readme3').html('该商品没有库存，不能销售');
+							event.returnValue = false;  
+						  $('#goodsno').focus(); 
+						  $('#goodsno').select(); 
+						  return false;
+			  		}
+					if(jsonArray.result[0].isover==1){
+						$('#readme3').html('该商品已停售');
+							event.returnValue = false;  
+						  $('#goodsno').focus(); 
+						  $('#goodsno').select(); 
+ 						  return false;
+			  		}					
+					
 					var  tabObj = document.getElementById("tbody1");
 					
 					var tdcontent='<tr>';
@@ -250,12 +271,19 @@ function calAll(){
 
 function cal(id){
 	var id_price=parseInt($('#price_'+id).val());
+	var id_num=parseInt($('#goodsnum_'+id).val());
 	
 	if(id_price<0){
 		alert('金额不能为负数');
 		$('#price_'+id).val(0);
 		return false;
 	}
+		if(id_num<=0){
+		alert('数量必须大于零的整数');
+		$('#goodsnum_'+id).val(0);
+		return false;
+	}
+	
 	//parseInt($('valuemaxnum_'+id).
 	//获取每产品最大数
 	//var goodsidlist=$F('goodsid');
@@ -290,10 +318,18 @@ function shoukuan(){
 	 //  $(".addnew").click(function(){ // Click to only happen on announce links
 	 var shishou=$('#allprice').html();
 	 var alltrueprice=$('#alltrueprice').html();
+	 
+	 //统计商品数量 超过最大值则报错
+	 
+	 
+	 
 		 $("#yingshou").val(alltrueprice);
 		 $("#shishou").val(shishou);
+		 $("#laikuan").val('');
+		 $("#zhaohui").val('');
  		 $('#laikuan').focus(); 
 		 $('#myModal').modal('show');
+		 $('#readme4').html('');
 
 	  // });
 	});
@@ -302,18 +338,19 @@ function shoukuan(){
 
 
 function saveit(){
-	var laikuan=$('laikuan').value;
-	var shishou=$('shishou').value;
+	var laikuan=$('#laikuan').val();
+	var shishou=$('#shishou').val();
 	if(laikuan==0){
-		alert('请填写来款金额！');
-		$('laikuan').focus(); 
+		$('#readme4').html('请填写来款金额');
+		$('#laikuan').focus(); 
 		return false;	}
 	if(Number(laikuan)<Number(shishou)){
-		if(!confirm('来款金额小于实收金额，是否允许欠款？')){
-			$('laikuan').focus(); 
-			$('laikuan').select(); 
+			$('#readme4').html('来款小于实收,不允许欠款');
+	//	if(!confirm('来款金额小于实收金额，是否允许欠款？')){
+			$('#laikuan').focus(); 
+			$('#laikuan').select(); 
 			return false;
-		}
+	//	}
 	}
 	
 	//alert('保存操作');
@@ -322,11 +359,16 @@ function saveit(){
 }
 
 function zhaohuikuan(){   
+		$('#readme4').html('');
 		var laikuan=$('#laikuan').val();
 		var shishou=$('#shishou').val();
 		var zhaohui=Number(laikuan)-Number(shishou);
 		$('#zhaohui').val(zhaohui.toFixed(2));
-
+		if(laikuan==0){
+			$('#readme4').html('请填写来款金额');
+		}else if(Number(laikuan)<Number(shishou)){
+			$('#readme4').html('来款小于实收,不允许欠款');
+		}
 		/*if(Number(laikuan)<Number(shishou)){
 			if(!confirm(laikuan+'来款金额小于实收金额'+shishou+'，是否允许欠款？')){
 				$('laikuan').focus(); 
@@ -343,7 +385,7 @@ function zhaohuikuan(){
     <!-- 动态弹出窗口代码 结束 -->
     
     <!-- Modal -->
-<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div id="myModal" class="modal hide fade sailbox" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
       <h3 id="myModalLabel">收款过账</h3>
@@ -361,10 +403,11 @@ function zhaohuikuan(){
           <label><input type="text" name="shishou" value=""  class="input-medium" id="shishou" placeholder="0" readonly="readonly" /> 元</label>
         </div>
       </div>
-      <div class="control-group">
+      <div class="control-group error">
         <label class="control-label" for="laikuan">现金来款：</label>
         <div class="controls">
           <label><input type="text" name="laikuan" value="" class="input-medium" id="laikuan" placeholder="输入现金来款" onkeyup="zhaohuikuan()"/> 元</label>
+          <div><small id="readme4" class="label-warning"></small></div>
         </div>
       </div>
       <div class="control-group">
@@ -374,13 +417,13 @@ function zhaohuikuan(){
         </div>
       </div>
 
-      <div class="control-group">
-        <label class="control-label">支付方式</label>
+      <div class="control-group error">
+        <label class="control-label"> 支付方式：</label>
         <div class="controls">
-           <label for="paytype1" class="radio inline"><input type="radio" name="paytype" id="paytype1"  value="1" checked="checked"/>
-         现金</label>
-          <label for="paytype2" class="radio inline" ><input type="radio" name="paytype" id="paytype2"  value="2" />
-          刷卡</label>
+         <label for="paytype1" class="radio inline"><input type="radio" name="paytype" id="paytype1"  value="cash" checked="checked"/>
+         <strong>现金</strong></label>
+          <label for="paytype2" class="radio inline" ><input type="radio" name="paytype" id="paytype2"  value="card" />
+          <strong>刷卡</strong></label>
         </div>
       </div>
     </div>

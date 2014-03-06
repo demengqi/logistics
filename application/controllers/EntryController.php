@@ -87,7 +87,7 @@ class EntryController extends MyClass_Action {
 				throw new Exception ( '数量不正确！' );
 
 			if(empty($p['inprice']) )
-				throw new Exception ( '零售价格格式错误！' );
+				throw new Exception ( '进货价格格式错误！' );
 
 			
 			$p['goodsno']=trim($p['goodsno']);
@@ -101,14 +101,14 @@ class EntryController extends MyClass_Action {
 				if(!$goodsid)
 					throw new Exception ( '该商品不存在，请重新确认！' );
 
-			$p['addtime']=time();
+			$p['addtime']=date('Y-m-d H:i:s');
 			$p['adddate']=date('Y-m-d');
 			$p['adduserid']=$this->_user->id;
 				
 				//add
 				$result=$this->_dbAdapter ->insert ( 'entry',$p);
 				if($result){
-					$this->_dbAdapter ->query ( 'update goods set goodsnum=goodsnum+'.$p['goodsnum'].' where goodsno="'.$p['goodsno'].'"');
+					$this->_dbAdapter ->query ( 'update goods set goodsnum=goodsnum+'.$p['goodsnum'].',inprice="'.$p['inprice'].'" where goodsno="'.$p['goodsno'].'"');
 				}
 			
 			if($result)

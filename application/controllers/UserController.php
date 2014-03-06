@@ -16,11 +16,11 @@ class UserController extends MyClass_Action {
 		try {
 			
 			
-			$sql='select * from users ';
-			$result=$this->_dbAdapter ->fetchAssoc ( $sql );
-			foreach($result as $key => $value){
-				$result[$key]['action']=explode(',',$value['action_list']);
-				$result[$key]['lasttime']=date('Y-m-d H:i',$value['lasttime']);
+			$sql='select * from users where id='.$this->_user->id;
+			$result=$this->_dbAdapter ->fetchRow ( $sql );
+			if($result){
+				$result['action']=explode(',',$result['action_list']);
+				$result['lasttime']=date('Y-m-d H:i',$result['lasttime']);
 			}
 			$this->view->result=$result;
 			
@@ -40,50 +40,10 @@ class UserController extends MyClass_Action {
 			}
 			
 			$p =$this->_request->getPost ();
-			$isok=0;
-			foreach($p['username'] as $key => $value){
-				if($key==1)
-					continue;
-					
-				$data=array('username'=>$value);
-				if(!empty($p['password'][$key]))
-					$data['password']=md5($p['password'][$key]);
-				
-				if(!empty($p['actionlist'][$key]))
-					$data['action_list']=implode(',',$p['actionlist'][$key]);
-					
-				$result=$this->_dbAdapter ->update ( 'users',$data,'id='.$key );
-				
-				if($result)
-					$isok=1;	
-			}
-			if($isok)
-				$this->feedback ( '更新成功', '注意', '/'.$this->controller, 'warning' );
-			else	
-				throw new Exception ( '更新失败 ！' );
-			//print_r($p);exit;
-		} catch ( Exception $e ) {
-			$this->feedback ( $e->getMessage (), '注意', 'javascript:window.history.back();', 'warning' );
-		}
-	}
-	
-	
-		//用户首页
-	public function changepasswordAction() {
-		try {
-		} catch ( Exception $e ) {
-			$this->feedback ( $e->getMessage (), '注意', 'javascript:window.history.back();', 'warning' );
-		}
-	}
-
-		//用户首页
-	public function opchangepasswordAction() {
-		try {
-			if (! $this->isPost ()) {
-					throw new Exception ( '参数错误！' );
-			}
+			$p['oldpassword']=trim($p['oldpassword']);
+			$p['newpassword']=trim($p['newpassword']);
+			$p['repassword']=trim($p['repassword']);
 			
-			$p =$this->_request->getPost ();
 			if (empty ( $p['oldpassword'] )) {
 				throw new Exception ( '旧密码不能为空 ！' );
 			}
@@ -95,6 +55,7 @@ class UserController extends MyClass_Action {
 			if ($p['repassword'] != $p['repassword']) {
 				throw new Exception ( '两次密码不一致！' );
 			}
+			
 			$p['oldpassword']=md5($p['oldpassword']);
 			$sql = 'select password from users where id=' .$this->_user ->id;
 			$password=$this->_dbAdapter ->fetchOne ( $sql );

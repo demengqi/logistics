@@ -16,19 +16,29 @@ class GoodsController extends MyClass_Action {
 	public function indexAction() {
 		try {
 
-			$count = 40; //pre
-			$curpage = 1;
+		//	$count = 40; //pre
+		//	$curpage = 1;
 				//get para
-			$curpage = ( int ) $this->_request->getParam ( 'page' );
-			if ($curpage < 1)
-				$curpage = 1;
+		//	$curpage = ( int ) $this->_request->getParam ( 'page' );
+		//	if ($curpage < 1)
+		//		$curpage = 1;
 			$where = '';
 			$order = ' order by `goodsid` desc';
-			$offset = ($curpage - 1) * $count;
-
+			$result=array();
+			$sum=array('goodsnum'=>0,'inprice'=>0,'outprice'=>0);
+		//	$offset = ($curpage - 1) * $count;
+			$issearch=0;
 			$this->view->typeid=$typeid = ( int ) $this->_request->getParam ( 'typeid' );
 			$this->view->brandid=$brandid = ( int ) $this->_request->getParam ( 'brandid' );
 			$this->view->goodsname=$goodsname = $this->_request->getParam ( 'goodsname' );
+			$all = $this->_request->getParam ( 'all' );
+			if($all){
+				$this->view->typeid=$typeid=0;
+				$this->view->brandid=$brandid =0;
+				$this->view->goodsname=$goodsname='';
+			}
+			
+			
 			if($typeid){
 				$where .=' and typeid='.$typeid;
 			}
@@ -38,10 +48,27 @@ class GoodsController extends MyClass_Action {
 			if(!empty($goodsname)){
 				$where .=' and (goodsno like "%'.$goodsname.'%" or goodsname like "%'.$goodsname.'%")';
 			}
+		
+		if($all<>'' || $typeid || $brandid || !empty($goodsname)){
+			$issearch=1;
 			
-		$sql = 'SELECT SQL_CALC_FOUND_ROWS * FROM goods_v where 1 ' . $where . $order . " limit $offset,$count";
-		//echo $sql;exit;
-		$result = $this->_dbAdapter->fetchAll ( $sql );
+		//$sql = 'SELECT SQL_CALC_FOUND_ROWS * FROM goods_v where 1 ' . $where . $order . " limit $offset,$count";
+			$sql = 'SELECT  * FROM goods_v where 1 ' . $where . $order ;
+			//echo $sql;exit;
+			$result = $this->_dbAdapter->fetchAll ( $sql );
+			
+			if($result){
+				foreach($result as $key => $value){
+					$result[$key]['inpriceall']=$value['goodsnum']*$value['inprice'];
+					$result[$key]['outpriceall']=$value['goodsnum']*$value['outprice'];
+					
+					$sum['goodsnum'] +=$value['goodsnum'];
+					$sum['inprice']  +=$value['goodsnum']*$value['inprice'];
+					$sum['outprice'] +=$value['goodsnum']*$value['outprice'];
+				}
+			}
+		}
+		/*
 			//翻页控制
 			$param ['file'] = '/' . $this->controller . '/' . $this->action;
 			$param ['totalnum'] = $this->_dbAdapter->fetchOne ( 'SELECT FOUND_ROWS()' );
@@ -52,24 +79,16 @@ class GoodsController extends MyClass_Action {
 			$page = new MyClass_Page ( $param );
 			$page->setvar(array('typeid' => $typeid,'brandid' => $brandid , 'goodsname' => $goodsname   ));
 			$this->view->page = $page->getNumPage ();
-
+*/
 			$this->view->typelist=$this->_dbAdapter->fetchPairs('select * from types ');
 			//获取品牌列表 
 			$this->view->brandlist=$this->_dbAdapter->fetchPairs('select * from brands ');
 			//获取单位列表
 			$this->view->unitlist=$this->_dbAdapter->fetchPairs('select * from units ');
 
-			//foreach($result as $key => $value){
-				//if(!empty($value['typeid']))
-				//	$result[$key]['type']=$this->view->typelist[$value['typeid']];
-				//if(!empty($value['brandid']))
-				//	$result[$key]['brand']=$this->view->brandlist[$value['brandid']];
-				//if(!empty($value['unitid']))
-				//	$result[$key]['unit']=$this->view->unitlist[$value['unitid']];
-		//	}
-			//print_r($result);
+			$this->view->issearch=$issearch;
 			$this->view->result = $result;
-			
+			$this->view->sum = $sum;
 			
 		} catch ( Exception $e ) {
 			$this->feedback ( $e->getMessage (), '注意', 'javascript:window.history.back();', 'warning' );
@@ -106,14 +125,15 @@ class GoodsController extends MyClass_Action {
 				$p[$key]=addslashes(trim($value));
 			}
 			
-			$p['addtime']=time();
+			$p['addtime']=date('Y-m-d H:i:s');
+			$p['lasttime']=date('Y-m-d H:i:s');
 			if(empty($p['goodsno']))
 				throw new Exception ( '不能为空！' );
 			if(empty($p['goodsname']))
 				throw new Exception ( '不能为空！' );
 //			if(!empty($p['inprice']) && !is_float($p['inprice']))
 	//			throw new Exception ( '进货价格格式错误！' );
-			if(empty($p['price']) )
+			if(empty($p['outprice']) )
 				throw new Exception ( '零售价格格式错误！' );
 				
 				$sql='select goodsid from goods where goodsno="'.$p['goodsno'].'"';
@@ -138,15 +158,14 @@ class GoodsController extends MyClass_Action {
 	public function editAction() {
 		try {
 
-			$idlist = $this->_request->getParam ( 'id' );
-			if(!$idlist)
+			$goodsid = $this->_request->getParam ( 'goodsid' );
+			if(!$goodsid)
 				throw new Exception ( '参数错误！' );
-			$sql='select * from goods where goodsid in ('.$idlist.')';
-			$result=$this->_dbAdapter->fetchAll($sql);
+			$sql='select * from goods where goodsid ='.$goodsid;
+			$result=$this->_dbAdapter->fetchRow($sql);
 			if(!$result)
 				throw new Exception ( '无数据！' );
 			$this->view->result=$result;
-			$this->view->num=count($result);
 			//print_r($result);
 
 			//获取类型列表
@@ -155,6 +174,8 @@ class GoodsController extends MyClass_Action {
 		$this->view->brandlist=$this->_dbAdapter->fetchPairs('select * from brands ');
 		//获取单位列表
 		$this->view->unitlist=$this->_dbAdapter->fetchPairs('select * from units ');
+		
+		
 		
 		} catch ( Exception $e ) {
 			$this->feedback ( $e->getMessage (), '注意', 'javascript:window.history.back();', 'warning' );
@@ -194,37 +215,36 @@ class GoodsController extends MyClass_Action {
 	}
 			
 	public function opeditAction(){
-				try {
-					if (! $this->isPost ()) {
+			try {
+				if (! $this->isPost ()) {
 					throw new Exception ( '参数错误！' );
-			}
+				}
 			
-			$p =$this->_request->getPost ();
-//			print_r($p);exit;
-			if(!isset($p['goodsid']) || empty($p['goodsid']))
-				throw new Exception ( '不能为空！' );
-			$isok=0;
-			foreach($p['goodsid'] as $key => $value){
-				$data=array();
+				$p =$this->_request->getPost ();
+				if(!isset($p['goodsid']) || empty($p['goodsid']))
+					throw new Exception ( '不能为空！' );
+
+				$isok=0;
 				foreach($p as $key1 => $value1){
 					if($key1<>'goodsid' && $key1<>'goodsno'){
-						$data[$key1]=addslashes(trim($value1[$key]));
+						$p[$key1]=addslashes(trim($value1));
 					}
 				}
-				$data['lasttime']=time();
+				$p['lasttime']=date('Y-m-d H:i:s');
+
 				//$this->log(Zend_Debug::dump($data,'data',0));
-				$this->log(var_export ( $data, true ));
-				if(!isset($data['isover']))
-					$data['isover']=0;
-				$result=$this->_dbAdapter->update('goods',$data,'goodsid='.$key);
+				$this->log(var_export ( $p, true ));
+				if(!isset($p['isover']))
+					$p['isover']=0;
+				$result=$this->_dbAdapter->update('goods',$p,'goodsid='.$p['goodsid']);
 				if($result)
 					$isok=1;
 				$this->log(var_export ( '[isok]'.$isok, true ));	
-			}
+
 			if($isok)
-				throw new Exception ( '保存修改成功 ！' );
+				throw new Exception ( '商品修改成功 ！' );
 			else	
-				throw new Exception ( '保存修改失败 ！' );
+				throw new Exception ( '商品修改失败或没有任何改变 ！' );
 			
 		} catch ( Exception $e ) {
 			$this->feedback ( $e->getMessage (), '注意', 'javascript:window.history.back();', 'warning' );
@@ -467,6 +487,117 @@ class GoodsController extends MyClass_Action {
 			exit;
 		}
 		
+	}
+	
+	
+	//入库单列表
+	public function entryAction() {
+		try {
+
+			$count = 20; //pre
+			$curpage = 1;
+				//get para
+			$curpage = ( int ) $this->_request->getParam ( 'page' );
+			if ($curpage < 1)
+				$curpage = 1;
+			$offset = ($curpage - 1) * $count;
+
+			$where = '';
+			$order = ' order by `entryid` desc';
+			
+			$this->view->goodsno=$goodsno = addslashes(trim($this->_request->getParam ( 'goodsno' )));
+
+			if(!empty($goodsno)){
+				$where .=' and (goodsno like "%'.$goodsno.'%" or goodsname like "%'.$goodsno.'%")';
+			}
+			
+			$sql = 'SELECT SQL_CALC_FOUND_ROWS * FROM entry_v where 1 ' . $where . $order." limit $offset,$count" ;
+			$result = $this->_dbAdapter->fetchAll ( $sql );
+			
+	
+			//翻页控制
+			$param ['file'] = '/' . $this->controller . '/' . $this->action;
+			$param ['totalnum'] = $this->_dbAdapter->fetchOne ( 'SELECT FOUND_ROWS()' );
+			$param ['perpagenum'] = $count; // 每页显示的数目
+			$param ['disnum'] = 7; // 取单数显示，当前页停在中间
+			$param ['curpage'] = $curpage; // 当前页码
+			$page = new MyClass_Page ( $param );
+			$page->setvar(array('goodsno' => $goodsno));
+			$this->view->page = $page->getNumPage ();
+
+			
+			$this->view->result = $result;
+
+		} catch ( Exception $e ) {
+			$this->feedback ( $e->getMessage (), '注意', 'javascript:window.history.back();', 'warning' );
+		}
+	}
+	
+		//用户首页
+	public function entryaddAction() {
+		try {
+		$this->view->datenow=date('Y年m月d日');
+		$this->view->goodsno= $this->_request->getParam ( 'goodsno' );
+		
+		} catch ( Exception $e ) {
+			$this->feedback ( $e->getMessage (), '注意', 'javascript:window.history.back();', 'warning' );
+		}
+	}
+
+
+		//用户首页
+	public function opentryaddAction() {
+		try {
+			if (! $this->isPost ()) {
+					throw new Exception ( '参数错误！' );
+			}
+			
+			$p =$this->_request->getPost ();
+		
+			foreach($p as $key => $value){
+				$p[$key]=addslashes(trim($value));
+			}
+			//print_r($p);exit;
+			$p['goodsnum']=intval($p['goodsnum']);
+			
+			if(empty($p['goodsno']))
+				throw new Exception ( '商品编号不能为空！' );
+
+			if(!$p['goodsnum'])
+				throw new Exception ( '数量不正确！' );
+
+			if(empty($p['inprice']) )
+				throw new Exception ( '进货价格格式错误！' );
+
+			
+			$p['goodsno']=trim($p['goodsno']);
+			$p['goodsnum']=intval(trim($p['goodsnum']));
+
+//			if(!empty($p['inprice']) && !is_float($p['inprice']))
+	//			throw new Exception ( '进货价格格式错误！' );
+				
+				$sql='select goodsid from goods where goodsno="'.$p['goodsno'].'"';
+				$goodsid=$this->_dbAdapter ->fetchOne ($sql);
+				if(!$goodsid)
+					throw new Exception ( '该商品不存在，请重新确认！' );
+
+			$p['addtime']=date('Y-m-d H:i:s');
+			$p['adddate']=date('Y-m-d');
+			$p['adduserid']=$this->_user->id;
+				
+				//add
+				$result=$this->_dbAdapter ->insert ( 'entry',$p);
+				if($result){
+					$this->_dbAdapter ->query ( 'update goods set goodsnum=goodsnum+'.$p['goodsnum'].',inprice="'.$p['inprice'].'" where goodsno="'.$p['goodsno'].'"');
+				}
+			
+			if($result)
+				$this->feedback ( '入库单增加成功', '注意', '/'.$this->controller.'/entryadd', 'warning' );
+			else	
+				throw new Exception ( '入库单增加失败 ！' );
+		} catch ( Exception $e ) {
+			$this->feedback ( $e->getMessage (), '注意', 'javascript:window.history.back();', 'warning' );
+		}
 	}
 	
 	

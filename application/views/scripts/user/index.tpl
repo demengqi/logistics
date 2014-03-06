@@ -1,57 +1,64 @@
 <div id="<*$controller*>">
-<form action="/<*$controller*>/op" method="post" class="form-horizontal">
-   <*foreach from=$result item=item key=key*>
-   <fieldset>
-   <legend>用户编号[<*$item.workid*>]:</legend>
-      <div class="control-group">
-	  <label class="control-label" for="username_<*$item.id*>">用户名</label>
-     <div class="controls">
-     <input type="text" name="username[<*$item.id*>]" value="<*$item.username*>" id="username_<*$item.id*>" class="input-medium" /><label class="help-inline"><i class="icon-edit"></i> <*$key*></label>
-       </div>
-	   </div>
-       
-       
-       <div class="control-group">
-	  <label class="control-label" for="password_<*$item.id*>">密码</label>
-     <div class="controls">
-     <*if $item.id==1*>
-         <span class="input-medium uneditable-input">***</span>
-      <*else*>
+<script type="text/javascript" >
+function checkit(){
+	var oldpassword=$('#oldpassword').val();
+	var newpassword=$('#newpassword').val();
+	var repassword=$('#repassword').val();
+	var isok=1;
 
-     <input type="text" name="password[<*$item.id*>]" value=""  id="password_<*$item.id*>" class="input-medium"  /><label class="help-inline"><i class="icon-edit"></i> <*$key*></label>
-      <*/if*>    
-      </div>
-	   </div>
-       
-      <div class="control-group">
-	  <label class="control-label" for="password_<*$item.id*>">操作权限</label>
-     <div class="controls">
-    <*foreach from=$setting.actionlist item=item1 key=key1*><label class="checkbox inline"><input  name="actionlist[<*$item.id*>][]" type="checkbox" value="<*$item1*>" id="actionlist_<*$key*>_<*$key1*>" class="checkbox" <*if $item.id==1*>disabled="disabled"<*/if*> <*if in_array($item1,$item.action)*>checked="checked"<*/if*>/><*$actionname.$item1*></label><*/foreach*>
-      </div>
-	   </div>
+	$('#readme1').html('');
+	$('#readme2').html('');
+	$('#readme3').html('');
 
-      <div class="control-group">
-	  <label class="control-label" >最后登录时间</label>
-     <div class="controls">
-         <span class="input-medium uneditable-input"><*$item.lasttime*></span>
-      </div>
-	   </div>
-       
-      <div class="control-group">
-	  <label class="control-label" >登录次数</label>
-     <div class="controls">
-         <span class="input-medium uneditable-input"><*$item.login_num*></span>
-      </div>
-	   </div>
+	if(oldpassword==''){
+		$('#readme1').html('旧密码不能为空');
+		isok=0;
+	}
+	if(newpassword==''){
+		$('#readme2').html('新密码不能为空');
+		isok=0;
+	}
+	if(newpassword != repassword){
+		$('#readme3').html('两次输入密码不一致');
+		isok=0;
+	}
+	if(isok==1)	
+		return true;
+	else
+		return false;
+}
+</script> 
 
-         <div class="control-group">
-          <div class="controls">
-			<button type="submit" class="btn btn-primary btn-large">保存新增</button>&nbsp;&nbsp;<button type="button" class="btn  btn-large" onclick="history.back()">放弃修改</button>
-		   </div>
-		</div>
-
-       </fieldset>
-  <*/foreach*>
-</form>
-
+  <form method="post" onsubmit="return checkit()" action="/<*$controller*>/op">
+    <dl class="dl-horizontal">
+      <dt>用户编号</dt>
+      <dd><*$result.workid*> </dd>
+      <dt>用户名</dt>
+      <dd><*$result.username*></dd>
+      <dt>最后登录于</dt>
+      <dd><*$result.lasttime*> </dd>
+      <dt>登录次数</dt>
+      <dd><*$result.login_num*> </dd>
+      <dt>操作权限</dt>
+      <dd><*foreach from=$setting.actionlist item=result1 key=key1*>
+        <*if in_array($result1,$result.action)*><*$actionname.$result1*><*/if*>&nbsp;
+        <*/foreach*> </dd>
+      <dt>原密码</dt>
+      <dd>
+        <input type="password" name="oldpassword" id="oldpassword" value=""  class="input-medium"  />&nbsp;<small id="readme1" class="label-warning"></small> 
+      </dd>
+      <dt>新密码</dt>
+      <dd>
+        <input type="password" name="newpassword" id="newpassword" value=""  class="input-medium"  />&nbsp;<small id="readme2" class="label-warning"></small> 
+      </dd>
+      <dt>再次输入新密码</dt>
+      <dd>
+        <input type="password" name="repassword" id="repassword" value=""  class="input-medium"  />&nbsp;<small id="readme3" class="label-warning"></small> 
+      </dd>
+      <dt>&nbsp;</dt>
+      <dd>
+        <button type="submit" class="btn btn-primary btn-large">保存密码</button>&nbsp;&nbsp;<button type="reset" class="btn btn-large">重置</button>
+      </dd>
+    </dl>
+  </form>
 </div>

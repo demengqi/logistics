@@ -4,6 +4,8 @@
  	 
 <*include file="<*$controller*>/location.tpl"*> </div>
     <div class="span6 clearfix " >
+        <h2>类别管理</h2>
+
 <form action="/<*$controller*>/optype" method="post">
 <table class="table">
 <*if $result*>

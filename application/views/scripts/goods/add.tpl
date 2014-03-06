@@ -4,18 +4,30 @@
  	 
 <*include file="<*$controller*>/location.tpl"*> </div>
     <div class="span10 clearfix " >
+        <h2>添加新商品</h2>
+
       <form onsubmit="return checkit();" action="/<*$controller*>/opadd" method="post" class="form-horizontal" >
         <table class="table">
-          <tr>
-            <th  class="span2">商品编号 <i class="icon-star"></i></th>
-            <td colspan="3"><input type="text" name="goodsno" value="<*$goodsno*>" class="input-xlarge" id="goodsno" placeholder="商品编号或条形码"/>
-              <small id="readme1" class="label-warning"></small></td>
+          <tr class="text-error">
+            <th  class="span2 ">商品编号 <i class="icon-star"></i></th>
+            <td colspan="3"><label class="control-group error"><input type="text" name="goodsno" value="<*$goodsno*>" class="input-xlarge" id="goodsno" placeholder="商品编号或条形码"/>
+              <small id="readme1" class="label-warning"></small></label>
+              <small class="text-info">保存后将不能修改</small>
+              </td>
           </tr>
-          <tr>
+          <tr class="text-error">
             <th>商品名称 <i class="icon-star"></i></th>
-            <td colspan="3"><input type="text" name="goodsname" value="" class="input-xlarge" id="goodsname"  placeholder="商品名称"/>
-              <small id="readme2" class="label-warning"></small></td>
+            <td colspan="3"><label class="control-group error"><input type="text" name="goodsname" value="" class="input-xlarge" id="goodsname"  placeholder="商品名称"/>
+              <small id="readme2" class="label-warning"></small></label>
+              <small class="text-info">保存后将不能修改</small>
+              </td>
           </tr>
+          <tr class="text-error">
+            <th>销售价格 <i class="icon-star"></i></th>
+            <td colspan="3"><label class="control-group error"><input type="text" name="outprice" value="" class="input-small span2" id="outprice" placeholder="零售价"/>&nbsp;&nbsp;元 <small id="readme3" class="label-warning"></small></label> 
+            </td>
+          </tr>
+          
           <tr>
             <th>单位</th>
             <td class="span3"><select name="unitid" id="unit" >
@@ -50,10 +62,6 @@
             <td><input type="text" name="huohao" value="" class="input-small" id="huohao" placeholder="货号"/></td>
           </tr>
           <tr>
-            <th>销售价格</th>
-            <td colspan="3"><label><input type="text" name="outprice" value="" class="input-small span2" id="memo" placeholder="对外销售价格"/>&nbsp;&nbsp;元</label></td>
-          </tr>
-          <tr>
             <th>备注</th>
             <td colspan="3"><input type="text" name="memo" value="" class="input-xxlarge" id="memo" placeholder="输入备注信息"/></td>
           </tr>
@@ -69,6 +77,7 @@
 function checkit(){
 	var goodsno=document.getElementById('goodsno').value;
 	var goodsname=document.getElementById('goodsname').value;
+	var outprice=document.getElementById('outprice').value;
 	var isok=1;
 	var first='';
 	if(goodsno==''){
@@ -85,6 +94,14 @@ function checkit(){
 			first='goodsname';
 	}else{
 		document.getElementById('readme2').innerHTML='';
+	}
+	if(outprice==''){
+		document.getElementById('readme3').innerHTML='零售价不能为空';
+		isok=0;
+		if(''==first)
+			first='outprice';
+	}else{
+		document.getElementById('readme3').innerHTML='';
 	}
 		
 	

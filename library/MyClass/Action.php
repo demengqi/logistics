@@ -14,7 +14,7 @@ class MyClass_Action extends Zend_Controller_Action {
 	protected $_smarty = NULL;
 	protected $_dbAdapter = NULL;
 	protected $_set = NULL;
-	protected $actionname=array('sail'=>'销售','set'=>'设置','stat'=>'统计','user'=>'权限','history'=>'记录','goods'=>'库存','entry'=>'入库');
+	protected $actionname=array('sail'=>'销售','set'=>'设置','stat'=>'统计','user'=>'帐户','history'=>'记录','goods'=>'库存','entry'=>'进货');
 		public function commonAction() {
 		
 		$this->controller = $this->getRequest ()->getControllerName ();
@@ -23,6 +23,7 @@ class MyClass_Action extends Zend_Controller_Action {
 		$this->view->action=$this->action;
 		$this->view->actionname=$this->actionname;
 		$this->view->isNoHead =0;
+		$this->view->nowdate=date('Y年m月d日');
 	
 		if($this->controller != 'login' && $this->controller!='error'){
 					

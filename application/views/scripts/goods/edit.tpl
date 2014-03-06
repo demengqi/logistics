@@ -4,103 +4,98 @@
  	 
 <*include file="<*$controller*>/location.tpl"*> </div>
     <div class="span10 clearfix " >
-<form onsubmit="return checkit();" action="/<*$controller*>/opedit" method="post" >
-<style type="text/css">
-dt{ position: absolute; z-index:10; float:left; width:150px; text-align:right}
-dd{ padding-left:155px; margin-bottom:6px;}
-</style>
-<*foreach from=$result item=item key=key*>
-<input type="hidden" name="goodsid[<*$item.goodsid*>]" value="<*$item.goodsid*>"d/>
-<dl>
-<dt>商品编号或条形码<span class="red">*</span></dt>
-<dd><input type="text" readonly="readonly" disabled="disabled" name="goodsno[<*$item.goodsid*>]" value="<*$item.goodsno*>" class="txt" id="goodsno<*$key*>"/><span id="readme1_<*$key*>" class="red"></span></dd>
-<dt>商品名称<span class="red">*</span></dt>
-<dd><input type="text" name="goodsname[<*$item.goodsid*>]" value="<*$item.goodsname*>" class="txt" id="goodsname<*$key*>"/><span id="readme2_<*$key*>" class="red"></span></dd>
-<dt>&nbsp;</dt>
-<dd><label class="checkbox"><input type="checkbox" name="isover[<*$item.goodsid*>]" value="1" id="isover<*$key*>" <*if $item.isover*> checked="checked"<*/if*>/> 停售</label></dd>
+        <h2>修改商品: <*$result.goodsname*>(<*$result.goodsno*>)</h2>
 
-<dt>单位</dt>
-<dd><select name="unitid[<*$item.goodsid*>]" id="unit<*$key*>">
-<option value="0" selected="selected"> 请选择单位 </option>
-<*foreach from=$unitlist item=item1 key=key1*>
-<option value="<*$key1*>" <*if $item.unitid== $key1*>selected="selected"<*/if*>><*$item1*></option>
-<*/foreach*>
-</select>
-</dd>
-<dt>类别</dt>
-<dd><select name="typeid[<*$item.goodsid*>]"  id="type<*$key*>">
-<option value="0" selected="selected"> 请选择类别 </option>
-<*foreach from=$typelist item=item1 key=key1*>
-<option value="<*$key1*>" <*if $item.typeid== $key1*>selected="selected"<*/if*>><*$item1*></option>
-<*/foreach*>
-</select></dd>
-<dt>品牌</dt>
-<dd><select name="brandid[<*$item.goodsid*>]" id="brand<*$key*>">
-<option value="0" selected="selected"> 请选择品牌 </option>
-<*foreach from=$brandlist item=item1 key=key1*>
-<option value="<*$key1*>" <*if $item.brandid== $key1*>selected="selected"<*/if*>><*$item1*></option>
-<*/foreach*>
-</select></dd>
-<dt>型号或尺码</dt>
-<dd><input type="text" name="xinghao[<*$item.goodsid*>]" value="<*$item.xinghao*>" class="txt" id="xinghao<*$key*>" /></dd>
-<dt>货号</dt>
-<dd><input type="text" name="huohao[<*$item.goodsid*>]" value="<*$item.huohao*>" class="txt" id="huohao<*$key*>" /></dd>
-<dt>商品数量</dt>
-<dd><*$item.goodsnum*></dd>
-<dt>零售价</dt>
-<dd><input type="text" name="outprice[<*$item.goodsid*>]" value="<*$item.outprice*>" class="txt" id="outprice<*$key*>" /></dd>
-<dt>规格或颜色</dt>
-<dd><input type="text" name="guige[<*$item.goodsid*>]" value="<*$item.guige*>" class="txt"  id="guige<*$key*>"/></dd>
-<dt>备注</dt>
-<dd><input type="text" name="memo[<*$item.goodsid*>]" value="<*$item.memo*>" class="txt" id="memo<*$key*>"/></dd>
-<dt>&nbsp;</dt>
-<dd><input type="submit" value="保存"  class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/<*$controller*>">返回商品列表</a></dd>
-</dl>
-<hr />
-<*/foreach	*>
-</form>
+      <form onsubmit="return checkit();" action="/<*$controller*>/opedit" method="post"  class="form-horizontal" >
+        <table class="table">
+          <tr>
+            <th  class="span2">商品编号 <i class="icon-star"></i></th>
+            <td colspan="3"><input type="text"   value="<*$result.goodsno*>" class="input-xlarge readonly" id="goodsno" placeholder="商品编号或条形码" readonly/>
+             &nbsp;&nbsp;<button type="button" class="btn  btn-small btn-success" onclick="window.location='/<*$controller*>/entryadd/goodsno/<*$result.goodsno*>'">增加进货单</button></td>
+          </tr>
+          <tr>
+            <th>商品名称 <i class="icon-star"></i></th>
+            <td colspan="3"><input type="text"   value="<*$result.goodsname*>" class="input-xlarge readonly" id="goodsname"  placeholder="商品名称" readonly/></td>
+          </tr>
+          <tr>
+            <th>销售价格</th>
+            <td colspan="3"><label><input type="text" name="outprice" value="<*$result.outprice*>" class="input-small span2" id="outprice" placeholder="零售价"/>&nbsp;&nbsp;元 <small id="readme3" class="label-warning"></small></label></td>
+          </tr>
+          <tr>
+            <th>零售价</th>
+            <td colspan="3">&yen; <strong class="text-info"><*$result.inprice*></strong> 元，现有数量是 <strong class="text-info"><*$result.goodsnum*></strong> ，进货价格及数量在进货单中录入</small> </td>
+          </tr>
+          
+          
+          <tr>
+            <th>单位</th>
+            <td class="span3"><select name="unitid" id="unit" >
+                <option value="0" selected="selected">选择单位</option>
+                    <*foreach from=$unitlist item=item1 key=key1*>
+                    <option value="<*$key1*>" <*if $result.unitid== $key1*>selected="selected"<*/if*>><*$item1*></option>
+                    <*/foreach*>
+              </select></td>
+            <th class="span2">规格或颜色</th>
+            <td><input type="text" name="guige" value="<*$result.guige*>" class="input-small"  id="guige" placeholder="规格或颜色"/></td>
+          </tr>
+          <tr>
+            <th>类别</th>
+            <td><select name="typeid"  id="type">
+                <option value="0" selected="selected"> 请选择类别 </option>
+                    <*foreach from=$typelist item=item1 key=key1*>
+                    <option value="<*$key1*>" <*if $result.typeid== $key1*>selected="selected"<*/if*>><*$item1*></option>
+                    <*/foreach*>
+              </select></td>
+            <th>型号或尺码</th>
+            <td><input type="text" name="xinghao" value="<*$result.xinghao*>" class="input-small" id="xinghao" placeholder="型号或尺码"/></td>
+          </tr>
+          <tr>
+            <th>品牌</th>
+            <td><select name="brandid" id="brand" >
+                <option value="0" selected="selected"> 请选择品牌 </option>
+                    <*foreach from=$brandlist item=item1 key=key1*>
+                    <option value="<*$key1*>" <*if $result.brandid== $key1*>selected="selected"<*/if*>><*$item1*></option>
+                    <*/foreach*>
+              </select></td>
+            <th>货号</th>
+            <td><input type="text" name="huohao" value="<*$result.huohao*>" class="input-small" id="huohao" placeholder="货号"/></td>
+          </tr>
+          <tr>
+            <th>备注</th>
+            <td colspan="3"><input type="text" name="memo" value="<*$result.memo*>" class="input-xxlarge" id="memo" placeholder="输入备注信息"/></td>
+          </tr>
+          <tr>
+            <th>&nbsp;</th>
+            <td colspan="3"><label><input type="checkbox" class="checkbox btn-large" value="1" name="isover" <*if $result.isover*>checked<*/if*> />&nbsp;该商品停售</label></td>
+          </tr>
+        </table>
+        <input type="submit" value="保存修改的商品信息"  class="btn btn-large btn-primary"/>
+        &nbsp;&nbsp;
+        <button type="button" class="btn  btn-large btn-success" onclick="window.location='/<*$controller*>/entryadd/goodsno/<*$result.goodsno*>'">增加进货单</button>&nbsp;&nbsp;
+        <button type="button" class="btn  btn-large" onclick="window.history.back();">返回列表</button>
+        <input type="hidden" name="goodsid" value="<*$result.goodsid*>"/>
+      </form>
     </div>
   </div>
 </div>
-
 <script type="application/javascript">
 function checkit(){
-	for(var i=0;i<<*$num*>; i++){
-	var goodsno=document.getElementById('goodsno'+i).value;
-	var goodsname=document.getElementById('goodsname'+i).value;
-	var price=document.getElementById('price'+i).value;
+	var outprice=document.getElementById('outprice').value;
 	var isok=1;
 	var first='';
-	if(goodsno==''){
-		document.getElementById('readme1_'+i).innerHTML='不能为空';
-		isok=0;
-		first='goodsno'+i;
-	}else{
-		document.getElementById('readme1_'+i).innerHTML='';
-	}
-	if(goodsname==''){
-		document.getElementById('readme2_'+i).innerHTML='不能为空';
+	if(outprice==''){
+		document.getElementById('readme3').innerHTML='零售价不能为空';
 		isok=0;
 		if(''==first)
-			first='goodsname'+i;
+			first='outprice';
 	}else{
-		document.getElementById('readme2_'+i).innerHTML='';
+		document.getElementById('readme3').innerHTML='';
 	}
-		if(price==''){
-		document.getElementById('readme3_'+i).innerHTML='不能为空';
-		isok=0;
-				if(''==first)
-			first='price'+i;
-
-	}else{
-		document.getElementById('readme3_'+i).innerHTML='';
-	}
+		
 	
 	if(!isok){
 		document.getElementById(first).focus();
 		return false;
-	}
-	
 	}
 	return true;
 }

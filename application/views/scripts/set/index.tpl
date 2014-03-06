@@ -1,4 +1,11 @@
-<div id="<*$controller*>">
+
+<div class="main container" id="<*$controller*>">
+  <div class="row">
+ <div class="span2 bs-docs-sidebar ">
+ 	 
+<*include file="<*$controller*>/location.tpl"*> </div>
+    <div class="span10 clearfix " >
+
 <form action="/<*$controller*>/op" method="post" class="form-horizontal">
   <*foreach from=$settinglist item=item key=key*>
       <div class="control-group">
@@ -13,7 +20,7 @@
 			<button type="submit" class="btn btn-primary btn-large">保存修改</button>&nbsp;&nbsp;<button type="button" class="btn  btn-large" onclick="history.back()">放弃修改</button>
 		   </div>
 		</div>
-  <hr />
+  <!-- hr />
   <fieldset>
         <div class="control-group">
 	  <label class="control-label" for="<*$key*>">字段变量</label>
@@ -41,9 +48,11 @@
 		   </div>
 		</div>
 
-  </fieldset>
+  </fieldset -->
 
 
 </form>
 
+    </div>
+  </div>
 </div>

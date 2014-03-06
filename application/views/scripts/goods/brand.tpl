@@ -4,6 +4,7 @@
  	 
 <*include file="<*$controller*>/location.tpl"*> </div>
     <div class="span6 clearfix " >
+    <h2>品牌管理</h2>
 
 <form action="/<*$controller*>/opbrand" method="post">
 <table class="table">

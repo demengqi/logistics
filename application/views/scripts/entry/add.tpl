@@ -39,9 +39,9 @@
             <td colspan="3"><label><input type="text" name="goodsnum" value="1" class="input-small" id="goodsnum" placeholder="" onkeyup="calAll()"/></label><div><small id="readme4" class="label-warning"></small></div></td>
           </tr>
           <tr>
-            <th>单价 <i class="icon-star"></i></th>
+            <th>进货价 <i class="icon-star"></i></th>
             <td colspan="3"><label>
-                <input type="text" name="inprice" value="0" class="input-small " id="inprice" placeholder="采购价格" onkeyup="calAll()"/>
+                <input type="text" name="inprice" value="0" class="input-small " id="inprice" placeholder="进货价" onkeyup="calAll()"/>
                 &nbsp;&nbsp;元&nbsp;<small id="readme5">&nbsp;&nbsp;(进货价不能大于零售价)</small></label>
                 <div><small id="readme2" class="label-warning"></small></div>
               
@@ -208,6 +208,7 @@ function checkgoods(event){
 					$('#goodsname').val(jsonArray.result[0].goodsname);
 					$('#unitname').val(jsonArray.result[0].unitname);
 					$('#outprice').val(jsonArray.result[0].outprice);
+					$('#inprice').val(jsonArray.result[0].inprice);
 					
 				}else{
 					$('#readme3').html('多于一个商品，请确认');

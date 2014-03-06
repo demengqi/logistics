@@ -49,7 +49,6 @@ Array
     [paytype] => 1
 )
 
-
 	*/
 	public function saveorderAction(){
 		try {
@@ -61,10 +60,22 @@ Array
 			//print_r($p);exit;
 			if(!isset($p['goodsid']) || !is_array($p['goodsid']))
 				throw new Exception ('参数错误');
+			if($p['laikuan']<=0)
+				throw new Exception ('来款不能为0');
+			if($p['laikuan']<$p['shishou'])
+				throw new Exception ('来款不能少于实收金额');
 			
-			$time=time();
+			if(($p['laikuan']-$p['zhaohui'])<>$p['shishou'])
+				throw new Exception ('来款-找回<>实收');
+			
+			$sailnum=0;
+			foreach($p['goodsid'] as $key => $value){
+				$sailnum +=$p['goodsnum'][$key];
+			}
+			$datetime=date('Y-m-d H:i:s');
 			$data=array('orderno'=>$p['orderno'],
 				'day'=>$p['day'],
+				'sailnum'=>$sailnum,
 				'yingshou'=>$p['yingshou'],
 				'shishou'=>$p['shishou'],
 				'laikuan'=>$p['laikuan'],
@@ -72,7 +83,7 @@ Array
 				'paytype'=>$p['paytype'],
 				'opuserid'=>$this->_user->id,
 				'workid'=>$this->_user->workid,
-				'addtime'=>$time,
+				'addtime'=>$datetime,
 			);
 			$result=$this->_dbAdapter->insert('orders',$data);
 			if(!$result)
@@ -87,9 +98,10 @@ Array
 					'goodsno'=>$p['goodsno'][$key],
 					'goodsnum'=>$p['goodsnum'][$key],
 					'price'=>$p['price'][$key],
-					'discount'=>$p['discount'][$key],
+					'trueprice'=>$p['trueprice'][$key],
+					'discount'=>0,
 					'adduserid'=>$this->_user->id,
-					'addtime'=>$time,
+					'addtime'=>$datetime,
 				);
 				$result=$this->_dbAdapter->insert('sails',$data);
 				if($result){
@@ -99,8 +111,7 @@ Array
 				}
 			}
 			if($i==count($p['goodsid'])){
-				
-				$this->feedback ( '订单处理成功', '恭喜', '/'.$this->controller, 'warning' );
+				$this->feedback ( '订单['.$p['orderno'].']处理成功!', '恭喜', '/'.$this->controller, 'warning' );
 			}else{
 				$this->_dbAdapter->delete('sails','orderid='.$insertid);
 				$this->_dbAdapter->delete('orders','orderid='.$insertid);
@@ -122,7 +133,7 @@ Array
 			if(empty($goodsno))
 				throw new Exception ( -2 );
 			
-			$sql='select * from goods where goodsno like "%'.$goodsno.'%" or goodsname like "%'.$goodsno.'%" and goodsnum>0';
+			$sql='select * from goods where goodsno like "%'.$goodsno.'%" or goodsname like "%'.$goodsno.'%" and goodsnum>0 and isover=0';
 			$result=$this->_dbAdapter->fetchAll($sql);
 			if(!$result)
 				throw new Exception ( -3 );
